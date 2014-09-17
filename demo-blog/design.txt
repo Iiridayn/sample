@@ -1,0 +1,12 @@
+DEMO BLOG
+
+Basic features:
+
+Post entries
+Index page (3? entries)
+View page for entries
+Comments, with moderation
+User login, multiple user posts
+Post, edit, delete
+Permalinks, incl. slugs
+Gravatars(?)
