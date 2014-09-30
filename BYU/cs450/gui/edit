@@ -1,0 +1,3 @@
+#!/bin/bash
+
+anjuta image_window.cpp image_window.h main_window.cpp main_window.h &

@@ -1,0 +1,1 @@
+need a set pixel function that checks if image is gray and works accordinly

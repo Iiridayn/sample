@@ -1,0 +1,43 @@
+#!/bin/bash
+
+if [ $# -ne 1 ] ; then
+  echo "USAGE: build [lib/bin/test/clean]"
+  exit -1;
+fi
+
+#local MYFILES
+#local LIBFILES
+
+function library {
+  cd lib
+  g++ -c *.cpp
+  ar -rcs libCS240Utils.a *.o
+  cd ..
+}
+
+function compile {
+  library
+  cd source
+  g++ -g -c *.cpp
+  cd ..
+  g++ -g -o webcrawler source/*.o -Llib -lCS240Utils
+}
+
+if [ "$1" == "lib" ] ; then
+  library
+elif [ "$1" == "bin" ] ; then
+  compile
+elif [ "$1" == "test" ] ; then
+  webcrawler http://faculty.cs.byu.edu/~rodham/index.html output stopwords
+elif [ "$1" == "clean" ] ; then
+  rm source/*.o
+  rm lib/*.o
+  rm lib/libCS240Utils.a
+  rm webcrawler
+  rm output/*
+else
+  echo "USAGE: build [lib/bin/test/clean]"
+  exit -1;
+fi
+
+exit 0;

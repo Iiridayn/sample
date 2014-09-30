@@ -1,0 +1,64 @@
+A) A:\Test.java:1: class test is public, should be declared in a file named test.java
+   There is no file named 'test', only one named 'Test'.  The class and the filename must be the same.
+
+B) No errors; Text within a string will be output regardless of what it says.
+
+C) A:\Test.java:5: ')' expected
+		System.out.println (An Emergency Broadcast");
+                                       ^
+   A:\Test.java:5: unclosed string literal
+		System.out.println (An Emergency Broadcast");
+                                                          ^
+   A:\Test.java:5: ';' expected
+		System.out.println (An Emergency Broadcast");
+                                                             ^
+   A:\Test.java:5: cannot resolve symbol
+   symbol  : variable An  
+   location: class Test
+		System.out.println (An Emergency Broadcast");
+                                    ^
+   4 errors
+   Finished
+   
+   The location of the string is defined by the quotes, so removing one messes up the boundaries of the string.
+
+D) A:\Test.java:5: unclosed string literal
+		System.out.println ("An Emergency Broadcast);
+                                    ^
+   A:\Test.java:5: ')' expected
+		System.out.println ("An Emergency Broadcast);
+                                                             ^
+   2 errors
+   Finished
+
+   Once again, a mess as a result of impropper definition of the string's location.
+
+E) No error, until run.  It tries to find the main method then, and fails, so it exits.
+
+F) A:\Test.java:5: cannot resolve symbol
+   symbol  : method bogus  (java.lang.String)
+   location: class java.io.PrintStream
+		System.out.bogus ("An Emergency Broadcast");
+                          ^
+   1 error
+   Finished
+
+   There is no command defined as that name, so when it searches for the place to pass the variable, it gets annoyed.
+
+G) No errors, see B)
+
+H) A:\Test.java:5: ';' expected
+		System.out.println ("An Emergency Broadcast")
+                                                             ^
+   1 error
+   Finished
+
+   The ';' defines the endof the statement.  Because of the absence of one, it wasn't sure where the statement ended.
+
+I) A:\Test.java:6: '}' expected
+	}
+         ^
+   1 error
+   Finished
+
+   Once again, the endof everything must be defined.  In this case, I never ended the class.

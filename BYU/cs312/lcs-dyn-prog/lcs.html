@@ -1,0 +1,68 @@
+<h1> Length of Longest Common Subsequences</h1> 
+
+<h2> Problem</h2> 
+
+Find the length of the longest common subsequence (LCS) of two
+strings.  Answer the burning question.  For extra credit, find the
+actual LCS in addition to its length.  See the <a
+href="lcs.pdf">handout</a> for a more detailed definition and
+recursive equation.
+
+<h2> Input</h2> 
+
+You'll be given a file containing to strings.  Each string ends with a
+newline character and may contain arbitrary characters including
+spaces and punctuation.  Each string may contain upto 20,000
+characters.  The strings may or may not be the same length.
+
+<h2> Output </h2> 
+
+Your program should print the length of the longest common subsequence
+for the given strings.  The definition of the longest common
+subsequence (LCS) and an equation for finding the LCS are given in a <a href="lcs.pdf">handout</a>.  
+<p> 
+
+This lab includes a <b>Burning Question</b>.  The burning question is: 
+<blockquote> 
+What is the big-O bound on the amount of memory used by your program?
+Justify your bound with a proof.
+</blockquote>
+As always, answering the burning question is a key factor in the
+design and implementation of your algorithm.
+
+<h2> Grading</h2> 
+
+The absolute performance requirement is 5 seconds of CPU time (as
+measured by /usr/bin/time) for any valid input file.  We are not going
+to use the cycle accurate timing harness this time around--but may for
+later projects.
+
+Its a "good thing" to post your performance results to the blog <a
+href="http://vv.cs.byu.edu/cs312/archives/000437.html">entry for
+performance results</a>.  When you do, report user time, tell which
+machine you are using and which test case you are using.  <h2> Sample
+files </h2>
+
+
+<p> 
+<h2>Project Distribution and Handin</h2>
+
+The project distribution (<a
+href="http://vv.cs.byu.edu/~jones/cs312/lcs-dyn-prog.tar.gz">lcs-dyn-prog.tar.gz<a>)
+includes a Makefile but does not include file IO or timing files.  You
+are on your own for file IO and use /usr/bin/time for timing.  Do
+"make handin" as usual to turn in your project.  Be sure to put your
+code in lcs.cc. Mail your answer to the burning question to your
+professor (jones@cs.byu.edu or egm@cs.byu.edu).
+
+
+<ul> 
+<li> <a href="easy.txt">easy.txt</a>  (length-LCS = 2) 
+<li> <a href="file2.txt">file2.txt</a> thanks to Mark Twain for providing the text (length-LCS = 1249) 
+<li> <a href="file3.txt">file3.txt</a> (length-LCS = 8443) 
+<li> <a href="file4.txt">file4.txt</a> (length-LCS = 8437)
+</ul> 
+Post your own test cases to the blog. 
+
+
+

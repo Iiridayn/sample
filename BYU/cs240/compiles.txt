@@ -1,0 +1,2 @@
+g++ -c 'filename'
+g++ -g -o 'exename' all .o files

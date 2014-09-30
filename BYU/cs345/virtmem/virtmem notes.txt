@@ -1,0 +1,13 @@
+page:
+RPT
+UPT
+page
+
+pinned to mem
+values 256 unsigned ints / page
+dirty bit?
+PID of page
+
+
+array of frames?
+store swap too

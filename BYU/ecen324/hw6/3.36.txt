@@ -1,0 +1,5 @@
+A. CNT = 9
+B. typedef struct {
+	int idx;
+	int x[4];
+   } a_struct;
