@@ -1,0 +1,7 @@
+	.ORIG	x0200
+	GETC
+	OUT
+	GETC
+	OUT
+	HALT
+	.END
