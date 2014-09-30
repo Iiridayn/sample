@@ -1,0 +1,19 @@
+Alarm clock program:
+
+call with the time to ring (24 or 12, 12 assumes next 12)
+discovers time until then, and sleeps (?) till that time
+can also give arg of total time
+
+Rings something, and listens at the keyboard for input.
+if it gets a time, snoozes until then
+if it gets a number, snoozes that many minutes
+if it gets a whitespace only, it snoozes for a default period (5 mins?)
+
+need an input parser that can handle 12, 24 hr time formats, and normal numbers, and ignore other strings w/o dying.  Swappable alarm functions?
+
+also have alarm function and signal, can look into that too
+- is for doing other things at the same time, !worky
+
+
+-- need to instantly read a typed character
+-- need to not wait for a char when I try to read while alarm is going off
