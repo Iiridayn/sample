@@ -1,0 +1,27 @@
+a^2 + b^2 = c^2
+a + b + c = 1000
+
+c = 1000 - a - b
+c = (a^2 + b^2)^0.5
+a + b + (a^2 + b^2)^0.5 = 1000
+- dead end.
+
+# Euclid's formula:
+a = m^2 - n^2
+b = 2mn
+c = m^2 + n^2
+
+m^2 - n^2 + 2mn + m^2 + n^2 = 1000
+2m^2 + 2mn = 1000
+m^2 + mn = 500
+n = (500 - m^2)/m
+
+Picked m = 20 as a first guess, n was 5.
+
+a = 375
+b = 200
+c = 425
+
+check: a + b + c = 1000.
+
+abc = 31875000

@@ -1,8 +1,4 @@
-import sys
-
-num = int(sys.argv[1])
-
-def primes(search):
+def primes():
     primes = [2,3]
     yield primes[0]
     yield primes[1]
@@ -19,12 +15,3 @@ def primes(search):
             primes.append(i)
             yield i
         i += 2
-        if i*i > search: break
-
-factors = []
-for p in primes(num):
-    if p*p > num: break
-    if not num % p:
-        factors.append(p)
-
-print(factors)
