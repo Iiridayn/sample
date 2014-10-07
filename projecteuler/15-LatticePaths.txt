@@ -1,0 +1,6 @@
+1x1 there are 2 paths - rd or dr.
+2x2 there are 6 paths - rrdd, rdrd, rddr, drrd, drdr, ddrr
+3x3 there are 20 paths - rrrddd, rrdrdd, rrddrd, rrdddr, rdrrdd, rdrdrd, rdrddr, rddrrd, rddrdr, rdddrr, drrrdd, drrdrd, drrddr, drdrrd, drdrdr, drddrr, ddrrrd, ddrrdr, ddrdrr, dddrrr
+000111, 001011, 001101, 001110, 010011, 010101, 010110, 011001, 011010, 011100, 100011, 100101, 100110, 101001, 101010, 101100, 110001, 110010, 110100, 111000
+
+These correspond to 2 choose 1, 4 choose 2, 6 choose 3 (six positions, choose 3 '1's to fill them). Generalized - x*2 choose x, or 40 choose 20.
