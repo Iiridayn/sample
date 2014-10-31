@@ -1,0 +1,23 @@
+Years have a 28 cycle, excepting certain century things.
+12 months, 7 days; some months correspond.
+364+1 days in year = 52 weeks, 1 day; 365%7=1.
+see https://en.wikipedia.org/wiki/Determination_of_the_day_of_the_week#Corresponding_months
+
+Table of 1st of month Sundays by first day of year (and leap years):
+		S	M	T	W	H	F	A
+Regular	2	2	1	1	3	1	2
+Leap	3	1	1	2	2	1	2
+
+Check: 12/7 = 1.71 - sum regular = 12 (/7), sum leap = 12
+
+Cycle starts Tuesday, non leap. Cycle: (Sunday = 0)
+2 3 4 L6 0 1 2 L4 5 6 0 L2 3 4 5 L0 1 2 3 L5 6 0 1 L3 4 5 6 L1
+T W H LA S M T LH F A S LT W H F
+1 1 3 2  2 2 1 2  1 2 2 1  1 3 1
+
+First 84 years don't matter - 48 Sundays/28 block (28/7*12), 3 blocks = 144
+1985 is a Tuesday like 1901, so count on cycle (add 2000 seperately).
+First 14 steps of the cycle sum to: 25.
+2000 is a leap year (divisible by 400), starts on Saturday so add another 2.
+
+Total: 144+25+2 = 171
