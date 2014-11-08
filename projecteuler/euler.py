@@ -18,6 +18,19 @@ def primes():
             yield i
         i += 2
 
+def is_prime(n):
+	'''Semi-efficient naive trial division'''
+	# credit: https://en.wikipedia.org/wiki/Primality_test
+	if n <= 3:
+		return n >= 2
+	if not n % 2 or not n % 3:
+		return False
+
+	for i in range(5, ceil(pow(n,0.5)), 6):
+		if not n % i or not n % (i+2):
+			return False
+	return True
+
 def divisors(num):
     '''Naive function to calculate divisors of an integer'''
     div = {1,num}
