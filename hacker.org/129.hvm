@@ -1,0 +1,13 @@
+;1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20
+
+0999**- # max = -729 - has to handle negative numbers
+63*1+ # i = 19 - index 0-19 = 20
+
+0^01-:1-4? # jump if i > -1
+1vp! # print max and end
+
+0^< # read mem[i] (preserving i on the stack)
+0^3^:1+7? # jump if number < max (after: [num, i, max])
+2vd1v1g # update max, skip d
+d1- # drop num, i--
+067*-g # jump to start of loop
