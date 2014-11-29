@@ -1,0 +1,27 @@
+3 digits, n = 3. 2 digits, n = 4. 1 digit, n = 5-9
+4 digits, n = 2, 9 digits - but n > 1
+number to beat is (9, n = 5) = 918273645
+number must start with a 9
+
+2 digits tricky with a 9 - easy enough to test:
+91 = 91 182 273 - 8 digits
+99 = 99 198 297 - same
+91 = 91 182 273 364 = 11 digits
+
+3 digits with a 9:
+987 = 987 1974 2961 = 11 digits
+912 = 912 1824 2736 = same
+
+So - must be 4.
+9876 = 9876 19752 = 9 digits
+so - 3x = y, where y is a 9 digit number, starting with 9 - multiple of 3
+digits in x can't correspond to 2x
+must be 94..18... (95.. or > repeats the 9)
+numbers in the second group (excepting overflow) will tend to be even
+so - a few more trials (4 or so - realized 93.., 27 was my first guess from that), got x = 9327 => 932718654. Correct.
+
+def multicat(x, n):
+    num = ''
+    for i in range(1,n+1):
+        num += str(x*i)
+    print(num)
