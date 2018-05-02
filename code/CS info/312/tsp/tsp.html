@@ -1,0 +1,93 @@
+<h1>TSP Branch and Bound</h1> 
+
+Solve the TSP problem using branch and bound.  We'll discuss the
+branch and bound algorithm in class.  A few helpful handouts are
+included in the docs directory of the project description.  The
+implementation of this algorithm will require more than an afternoon. 
+
+<h2>Input</h2> 
+
+You will read input from a file.  The first line of the file will
+contain two integers.  The first, n, gives the number of cities in the
+problem.  The second gives the time bound, <b>in thousandths of a
+second</b>, for that problem.  The cost matrix is given in the next n
+lines.  Each line contains n numbers per line.  Cities are named using
+letters of the alphabet <b>starting with "A" through "Z"</a> then
+using "a" through "z".  (So the first line of the input file contains
+the distance from city "A" to every other city).  A few examples, with
+solutions, are given in the project distribution.
+
+<h2>Implementation</h2> 
+
+You will implement a branch and bound algorithm to solve the tsp
+problem within the given time bound.  If time expires before your
+algorithm finds a solution, then you should return the best solution
+you've found so far and exit.  You don't need to invent your own
+algorithm.  The algorithms discussed in class will work just fine.
+
+<h2>Output</h2> 
+
+If you succede in finding the optimal solution, output the following (where time is reported in seconds): 
+<pre> 
+File: a.txt
+Limit: 4.00
+Time: 3.21 
+OPTIMAL 
+Distance: 20
+Tour: ABECD
+</pre> 
+Where Time is the number of seconds you used.  Note that the tour
+output always starts with city a.  <p>
+
+If you don't succede in finding the optimal soution, then output the following: 
+<pre> 
+File: a.txt 
+Limit: 2.00
+Time: 2.01 
+NOT Optimal
+Distance: 32
+Tour: AECBD
+</pre> 
+Note that the used time was pretty close to the time limit.  You don't
+have to check the time between every two instructions--just enough to
+quit near the time limit.  If you are clever, you could set an alarm
+and use an interrupt handler to print the incomplete result when the
+alarm goes off.  If that didn't make sense, don't worry about it, just
+check the time in your loop somewhere.
+
+<h2> Grading </h2> 
+
+Absolute performance requirements are given in each input file.
+You'll be graded on how well you algorithm performs an a set of
+benchmark problems.  Some problems will be designed to be completable
+by a "reasonable" implementation, other will be designed to too hard
+for a "reasonable" implementation to complete within the time bound.
+For the second class of problems, you'll be graded on how close your
+solution is to the optimal solution.  For each such problem, we'll
+decide that an answer within x% of optimal gets full credit.<p> 
+
+Relative performance will be measured on time required to find a
+solution and closeness to an optimal solution. 
+
+<h2> Code </h2> 
+
+The project file distribution includes a timing function in tsp.cc
+that you should use to measure time in your code.  Remember that you
+need to print a partial solution and exit when time expires.  Write
+your code in tsp.cc
+
+<h2> Burning Question </h2> 
+
+The Burning Question is pretty simple since the implementation is not: 
+<blockquote> 
+What did you do to reduce the memory usage of your implementation?
+</blockquote> 
+
+<h2> Handin </h2> 
+
+Handin, as usual, is done using a Makefile.  Write your code in
+tsp.cc and be sure your project compiles with the standard Makefile
+included in the project.  <p> 
+
+Mail your burning answer to your professor, either jones@cs.byu.edu or
+egm@cs.byu.edu 

@@ -1,0 +1,103 @@
+#include "WordTree.h"
+
+void WordTree::insert(string word, string url, string title) {
+  if(head == 0) {
+    head = new Word(word);
+    if(url != "")
+      head->insert(url, title);
+  }
+  else {
+    Word* temp = head;
+    bool unfound = true;
+    while(unfound) {
+      if(temp->word < word){
+	if(temp->left != 0)
+	  temp = temp->left;
+	else {
+	  temp->left = new Word(word);
+	  if(url != "")
+	    temp->left->insert(url, title);
+	  unfound = false;
+	}
+      }
+      else if(temp->word > word) {
+	if(temp->right != 0)
+	  temp = temp->right;
+	else {
+	  temp->right = new Word(word);
+	  if(url != "")
+	    temp->right->insert(url, title);
+	  unfound = false;
+	}
+      }
+      else {
+	if(url != "")
+	  temp->insert(url, title);
+	unfound = false;
+      }
+    }//while
+  }//else
+}
+
+bool WordTree::isin(string word) {
+  bool found = false;
+  Word* temp = head;
+  while(!found && temp != 0) {
+    if(temp->word > word)
+      temp = temp->right;
+    else if(temp->word < word)
+      temp = temp->left;
+    else
+      found = true;
+  }
+  if(temp == 0)
+    return false;
+  return true;
+}
+
+void WordTree::destruct(Word* temp) {
+  if(temp == 0)
+    return;
+  destruct(temp->left);
+  destruct(temp->right);
+  delete temp;
+}
+
+Word* WordTree::pop() { //need to refine
+  if(head == 0) return 0;
+  Word* temp = head;
+  Word* parent = 0;
+  bool left = false;
+  bool right = false;
+  while(temp->left != 0) {
+    parent = temp;
+    temp = temp->left;
+    left = true;
+    right = false;
+  }
+  while(temp->right != 0) {
+    parent = temp;
+    temp = temp->right;
+    left = false;
+    right = true;
+    while(temp->left != 0) {
+      parent = temp;
+      temp = temp->left;
+      left = true;
+      right = false;
+    }
+  }
+  if(left) {
+    parent->left = 0;
+    return temp;
+  }
+  else if(right) {
+    parent->right = 0;
+    return temp;
+  }
+  else {
+    temp = head;
+    head = 0;
+    return temp;
+  }
+}

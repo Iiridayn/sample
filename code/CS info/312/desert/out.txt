@@ -1,0 +1,599 @@
+Trial 1: Impossible
+
+Trial 2: 27 units of food
+
+Trial 3: 45 units of food
+
+Trial 4: 86 units of food
+
+Trial 5: 66 units of food
+
+Trial 6: 29 units of food
+
+Trial 7: 4344 units of food
+
+Trial 8: 86 units of food
+
+Trial 9: 104 units of food
+
+Trial 10: 824 units of food
+
+Trial 11: 67 units of food
+
+Trial 12: Impossible
+
+Trial 13: Impossible
+
+Trial 14: Impossible
+
+Trial 15: 46 units of food
+
+Trial 16: Impossible
+
+Trial 17: 106 units of food
+
+Trial 18: 48 units of food
+
+Trial 19: Impossible
+
+Trial 20: 57 units of food
+
+Trial 21: 41 units of food
+
+Trial 22: 57 units of food
+
+Trial 23: 26 units of food
+
+Trial 24: Impossible
+
+Trial 25: Impossible
+
+Trial 26: Impossible
+
+Trial 27: 18 units of food
+
+Trial 28: Impossible
+
+Trial 29: 189 units of food
+
+Trial 30: 119 units of food
+
+Trial 31: Impossible
+
+Trial 32: Impossible
+
+Trial 33: Impossible
+
+Trial 34: 25383 units of food
+
+Trial 35: 90 units of food
+
+Trial 36: 107 units of food
+
+Trial 37: Impossible
+
+Trial 38: Impossible
+
+Trial 39: Impossible
+
+Trial 40: Impossible
+
+Trial 41: 63 units of food
+
+Trial 42: 197 units of food
+
+Trial 43: Impossible
+
+Trial 44: Impossible
+
+Trial 45: Impossible
+
+Trial 46: 53 units of food
+
+Trial 47: 16 units of food
+
+Trial 48: 58 units of food
+
+Trial 49: 65 units of food
+
+Trial 50: 1012 units of food
+
+Trial 51: 191 units of food
+
+Trial 52: 509 units of food
+
+Trial 53: Impossible
+
+Trial 54: 75 units of food
+
+Trial 55: 35 units of food
+
+Trial 56: 56 units of food
+
+Trial 57: 103 units of food
+
+Trial 58: 17 units of food
+
+Trial 59: 51 units of food
+
+Trial 60: 39 units of food
+
+Trial 61: Impossible
+
+Trial 62: 7476 units of food
+
+Trial 63: Impossible
+
+Trial 64: Impossible
+
+Trial 65: 610 units of food
+
+Trial 66: Impossible
+
+Trial 67: 183 units of food
+
+Trial 68: 101 units of food
+
+Trial 69: 67 units of food
+
+Trial 70: 44 units of food
+
+Trial 71: Impossible
+
+Trial 72: 77 units of food
+
+Trial 73: Impossible
+
+Trial 74: 94 units of food
+
+Trial 75: 10547 units of food
+
+Trial 76: 40 units of food
+
+Trial 77: Impossible
+
+Trial 78: Impossible
+
+Trial 79: 865 units of food
+
+Trial 80: Impossible
+
+Trial 81: Impossible
+
+Trial 82: Impossible
+
+Trial 83: Impossible
+
+Trial 84: 64 units of food
+
+Trial 85: 104 units of food
+
+Trial 86: 62 units of food
+
+Trial 87: 1716 units of food
+
+Trial 88: 89 units of food
+
+Trial 89: 125 units of food
+
+Trial 90: Impossible
+
+Trial 91: 27242 units of food
+
+Trial 92: Impossible
+
+Trial 93: 38 units of food
+
+Trial 94: Impossible
+
+Trial 95: Impossible
+
+Trial 96: Impossible
+
+Trial 97: Impossible
+
+Trial 98: 74 units of food
+
+Trial 99: 9 units of food
+
+Trial 100: 60 units of food
+
+Trial 101: Impossible
+
+Trial 102: Impossible
+
+Trial 103: Impossible
+
+Trial 104: 329 units of food
+
+Trial 105: Impossible
+
+Trial 106: Impossible
+
+Trial 107: Impossible
+
+Trial 108: 69 units of food
+
+Trial 109: 74 units of food
+
+Trial 110: 87 units of food
+
+Trial 111: 51 units of food
+
+Trial 112: Impossible
+
+Trial 113: 92 units of food
+
+Trial 114: 109 units of food
+
+Trial 115: 114 units of food
+
+Trial 116: Impossible
+
+Trial 117: 74 units of food
+
+Trial 118: 924 units of food
+
+Trial 119: Impossible
+
+Trial 120: 111 units of food
+
+Trial 121: Impossible
+
+Trial 122: 2149 units of food
+
+Trial 123: Impossible
+
+Trial 124: Impossible
+
+Trial 125: 83 units of food
+
+Trial 126: 314 units of food
+
+Trial 127: 62 units of food
+
+Trial 128: 1556 units of food
+
+Trial 129: 97 units of food
+
+Trial 130: Impossible
+
+Trial 131: 199 units of food
+
+Trial 132: Impossible
+
+Trial 133: 53 units of food
+
+Trial 134: 83 units of food
+
+Trial 135: 56 units of food
+
+Trial 136: 104 units of food
+
+Trial 137: 18468 units of food
+
+Trial 138: 185 units of food
+
+Trial 139: 98 units of food
+
+Trial 140: Impossible
+
+Trial 141: 35 units of food
+
+Trial 142: 49 units of food
+
+Trial 143: 717 units of food
+
+Trial 144: Impossible
+
+Trial 145: Impossible
+
+Trial 146: 92 units of food
+
+Trial 147: 425 units of food
+
+Trial 148: 30 units of food
+
+Trial 149: 17301 units of food
+
+Trial 150: 100 units of food
+
+Trial 151: 28 units of food
+
+Trial 152: 46 units of food
+
+Trial 153: 62 units of food
+
+Trial 154: 87 units of food
+
+Trial 155: Impossible
+
+Trial 156: Impossible
+
+Trial 157: 40 units of food
+
+Trial 158: 52 units of food
+
+Trial 159: 198 units of food
+
+Trial 160: 57 units of food
+
+Trial 161: 72 units of food
+
+Trial 162: 53 units of food
+
+Trial 163: Impossible
+
+Trial 164: 58 units of food
+
+Trial 165: Impossible
+
+Trial 166: 58 units of food
+
+Trial 167: Impossible
+
+Trial 168: Impossible
+
+Trial 169: 62 units of food
+
+Trial 170: 78 units of food
+
+Trial 171: 14 units of food
+
+Trial 172: Impossible
+
+Trial 173: Impossible
+
+Trial 174: 472 units of food
+
+Trial 175: 39 units of food
+
+Trial 176: 55 units of food
+
+Trial 177: 227 units of food
+
+Trial 178: 76 units of food
+
+Trial 179: 2219 units of food
+
+Trial 180: Impossible
+
+Trial 181: 90 units of food
+
+Trial 182: 1006 units of food
+
+Trial 183: Impossible
+
+Trial 184: 17 units of food
+
+Trial 185: 74 units of food
+
+Trial 186: Impossible
+
+Trial 187: Impossible
+
+Trial 188: Impossible
+
+Trial 189: Impossible
+
+Trial 190: 69 units of food
+
+Trial 191: Impossible
+
+Trial 192: 304 units of food
+
+Trial 193: 10 units of food
+
+Trial 194: Impossible
+
+Trial 195: 38 units of food
+
+Trial 196: 43 units of food
+
+Trial 197: 94 units of food
+
+Trial 198: 78 units of food
+
+Trial 199: 100 units of food
+
+Trial 200: 26 units of food
+
+Trial 201: 65 units of food
+
+Trial 202: Impossible
+
+Trial 203: 91 units of food
+
+Trial 204: 66 units of food
+
+Trial 205: 90 units of food
+
+Trial 206: Impossible
+
+Trial 207: 212 units of food
+
+Trial 208: 11 units of food
+
+Trial 209: 17 units of food
+
+Trial 210: 53 units of food
+
+Trial 211: 61 units of food
+
+Trial 212: 339 units of food
+
+Trial 213: Impossible
+
+Trial 214: 212 units of food
+
+Trial 215: Impossible
+
+Trial 216: 449 units of food
+
+Trial 217: Impossible
+
+Trial 218: 102 units of food
+
+Trial 219: Impossible
+
+Trial 220: 51 units of food
+
+Trial 221: 92 units of food
+
+Trial 222: 102 units of food
+
+Trial 223: 27864 units of food
+
+Trial 224: Impossible
+
+Trial 225: 1050 units of food
+
+Trial 226: Impossible
+
+Trial 227: 211 units of food
+
+Trial 228: 54 units of food
+
+Trial 229: Impossible
+
+Trial 230: Impossible
+
+Trial 231: 57 units of food
+
+Trial 232: 633 units of food
+
+Trial 233: Impossible
+
+Trial 234: 199 units of food
+
+Trial 235: 5245 units of food
+
+Trial 236: 2011 units of food
+
+Trial 237: 58 units of food
+
+Trial 238: 743 units of food
+
+Trial 239: 48 units of food
+
+Trial 240: 915 units of food
+
+Trial 241: Impossible
+
+Trial 242: 78 units of food
+
+Trial 243: 69 units of food
+
+Trial 244: Impossible
+
+Trial 245: 3673 units of food
+
+Trial 246: 197 units of food
+
+Trial 247: 39 units of food
+
+Trial 248: 51 units of food
+
+Trial 249: 332 units of food
+
+Trial 250: 36 units of food
+
+Trial 251: 42 units of food
+
+Trial 252: 40 units of food
+
+Trial 253: 35 units of food
+
+Trial 254: 51 units of food
+
+Trial 255: 1579 units of food
+
+Trial 256: 70 units of food
+
+Trial 257: 313 units of food
+
+Trial 258: 116 units of food
+
+Trial 259: Impossible
+
+Trial 260: Impossible
+
+Trial 261: 313 units of food
+
+Trial 262: 14 units of food
+
+Trial 263: Impossible
+
+Trial 264: Impossible
+
+Trial 265: 69 units of food
+
+Trial 266: Impossible
+
+Trial 267: Impossible
+
+Trial 268: 39 units of food
+
+Trial 269: 192 units of food
+
+Trial 270: Impossible
+
+Trial 271: 1353 units of food
+
+Trial 272: 37 units of food
+
+Trial 273: 388 units of food
+
+Trial 274: 100 units of food
+
+Trial 275: Impossible
+
+Trial 276: 66 units of food
+
+Trial 277: Impossible
+
+Trial 278: Impossible
+
+Trial 279: 2717 units of food
+
+Trial 280: 69 units of food
+
+Trial 281: 246 units of food
+
+Trial 282: Impossible
+
+Trial 283: 101 units of food
+
+Trial 284: 105 units of food
+
+Trial 285: Impossible
+
+Trial 286: 78 units of food
+
+Trial 287: 7756 units of food
+
+Trial 288: 97 units of food
+
+Trial 289: Impossible
+
+Trial 290: 65 units of food
+
+Trial 291: 93 units of food
+
+Trial 292: Impossible
+
+Trial 293: 82 units of food
+
+Trial 294: 2608 units of food
+
+Trial 295: 13 units of food
+
+Trial 296: Impossible
+
+Trial 297: Impossible
+
+Trial 298: Impossible
+
+Trial 299: 2364 units of food
+
+Trial 300: 93 units of food

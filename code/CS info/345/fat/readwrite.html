@@ -1,0 +1,58 @@
+<html>
+<head>
+	<title>Help for FAT read/write funcitons</title>
+</head>
+<body>
+<center>
+	<h2>Reading and Writing Sectors from the "NUTT" book</h2>
+</center>
+
+<p>
+Below is a great example of funcitons you might want to have in your code to assist you in reading and writing sectors to the .img file.  Before the functions are described, there is code representing things that need to be done before calling them - namely, opening the .img file.
+</p>
+<pre>
+<p>
+<b>int fd_fid;	/* global variable set by the open() funciton*/
+int bps;	/* set to hold the # of Bytes Per Sector*/
+...
+fid = open(mountname, O_RDWR);
+...
+
+int fd_read(int sector_number, char* buffer)
+{
+	int dest, lent;
+	
+	dest = lseek(fid, sector_number*bps, SEEK_SET);
+	if(dest != sector_number*bps)
+		/* handle error here */
+	
+	len = read(fid, buffer, bps);
+	if(len != bps)
+		/* handle error here */
+	
+	return len;
+}
+
+
+
+int fd_write(int sector_number, char* buffer)
+{
+	int dest, leng;
+	
+	dest = lseek(fid, sector_number*bps, SEEK_SET);
+	if(dest != sector_number*bps)
+		/* handle error here */
+	
+	len = write(fid, buffer, bps);
+	if(len != bps)
+		/* handle error here */
+	
+	return len;
+	
+	
+}
+</pre>
+</p>
+
+</body>
+</html>

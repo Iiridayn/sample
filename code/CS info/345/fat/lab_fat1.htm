@@ -1,0 +1,269 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<!-- Lab spec created by Travis Leithead and Mark Richards, May-June-July 2002 -->
+  <title>FAT File System</title>
+</head>
+<body bgcolor="#ffffff">
+<p align="center"><font size="6">MS-DOS<sup>&reg;</sup> FAT File System 1<br>
+</font> <font size="2">[<a href="lab_fat_help.htm">Help Index</a>]</font></p>
+<p><b>Objectives:</b></p>
+<ul>
+	<li> 		Understand the boot sector 	</li>
+	<li> 		Understand the organization of file allocation tables (FAT) 	</li>
+	<li> 		Understand FAT directory structures and their fields 	</li>
+	<li> 		Understand FAT cluster chains 	</li>
+	<li> 		Know the difference between a Cluster and a Sector 	</li>
+	<li> 		Implement a shared object that mimics the MS-DOS commands <i>DIR,
+CD, 		DEL, RMDIR, MKDIR,</i> and <i>COPY</i> 	</li>
+</ul>
+<p><b>Requirements:</b></p>
+<ol>
+	<li> 		Create a shared object that can be loaded and used by the TA FAT
+manager 		program (<a href="#Download">download</a>).  Your shared
+object will read and write 		sectors on a FAT-12 volume (in our case a floppy disk image) and 		will maintain a "current directory". 
+The functions you need to implement 		are shown and explained below. 
+File and directory names can be assumed 		to be at most 8 characters
+long, with an optional 3 character maximum 		extension (filenames are
+separated from extensions by a dot [.]). 	</li>
+	<li> 		You will be responsible for creating each of the following
+functions. 		<font color="#ff0000">Your functions must have these
+exact names:</font> 		
+    <ul>
+			<li> 				<font face="Courier New">int fdLoadMntPt(char *mountname)</font>
+				
+        <ul>
+					<li> 					The TA FAT Manager
+will 					set the mount point after loading the
+shared object. 						This function will <i>always</i> be called
+before any of the following 			        	functions. 					</li>
+					<li> 						<font face="Courier New">mountname</font> is either the
+string 						representing the disk image name,
+and can 						be passed directly into the first parameter of <b>open</b>
+						(see <a
+ href="lab_fat_help.htm#Reading%20and%20Writing%20to%20the%20floppy%20disk%20or%20a%20disk%20image">Reading
+						and Writing to the floppy disk or a disk image</a>) 					</li>
+					<li> 						Subsequent calls to this function should first unmount
+the current 						file system and then mount the system specified in
+the string 						<font face="Courier New">mountname</font> 					</li>
+					<li> 						Should return 1 for success, 0 for failure 					</li>
+				
+        </ul>
+			</li>
+			<li> 				<font face="Courier New">char* fdListDir()</font> 				
+        <ul>
+					<li> 						Called by command <font face="Courier New">DIR</font>
+					</li>
+					<li> 						Reads the contents of the current directory, formats the
+output, 						and then returns them through the <font
+ face="Courier New">char*</font> 					</li>
+					<li> 						Allocate memory (using <font face="Courier New">new</font>)
+for 						the directory listing that will be returned.  (This memory
+will 						be deleted by the function <font face="Courier New">fdDelMem</font>)
+					</li>
+					<li> 						Loop through the current directory adding valid
+directory entries 						to the return string. 					</li>
+					<li> 						Valid directory entries include all names, extensions,
+times, dates, 						attributes, start clusters, and file sizes. 					</li>
+					<li> 						Return the pointer to the allocated string for success,
+NULL for 						failure. 					</li>
+				
+        </ul>
+			</li>
+			<li> 				<font face="Courier New">int fdDelMem(char *str)</font> 				
+        <ul>
+					<li> 						To avoid memory leaks, this function is called
+automatically 						by the TA FAT Manager immediately after a call to
+						<font face="Courier New">fdListDir</font>, or 						<font
+ face="Courier New">fdGetFat</font>. 					</li>
+					<li> 						Delete the memory pointed to by <font face="Courier New">str</font>
+						(using <font face="Courier New">delete</font>). 					</li>
+					<li> 						Always return a 1 for success. 					</li>
+				
+        </ul>
+			</li>
+			<li> 				<font face="Courier New">int fdChangeDir(char *dir)</font>
+				
+        <ul>
+					<li> 						Called by command <font face="Courier New">CD
+&lt;dir&gt;</font> 					</li>
+					<li> 						Change the current directory to the subdirectory
+specified by the 						argument.  You will only need to handle moving
+up a single directory 						or moving down a single subdirectory. 					</li>
+					<li> 						Verify that <font face="Courier New">dir</font> is a
+valid directory 						name in the current directory 					</li>
+					<li> 						Change the current directory to the specified
+subdirectory.  If 						<font face="Courier New">dir</font> is the
+directory dotdot [..] then 						change to the parent directory. 					</li>
+					<li> 						Return a 1 if the directory was changed, or 0 for
+failure 					</li>
+				
+        </ul>
+			</li>
+			<li> 				<font face="Courier New">int fdEraseFile(char *filename)</font>
+				
+        <ul>
+					<li> 						Called by command <font face="Courier New">DEL
+&lt;filename&gt;</font> 					</li>
+					<li> 						<font face="Courier New">filename</font> is the name of
+the file to 						remove. 					</li>
+					<li> 						Verify that <font face="Courier New">filename</font>
+exists in the 						current directory, and that it is a valid file.
+					</li>
+					<li> 						Zero out the file's FAT cluster chain. 					</li>
+					<li> 						Modify the file's directory entry to indicate that it
+has been deleted 						(see <a
+ href="lab_fat_help.htm#How%20DOS%20deletes%20files/directories">How
+						DOS deletes files/directories</a>). 					</li>
+					<li> 						Return a 1 after successfully removing the file, or 0
+for any failure. 					</li>
+				
+        </ul>
+			</li>
+			<li> 				<font face="Courier New">int fdDelDir(char *dirname)</font>
+				
+        <ul>
+					<li> 						Called by command <font face="Courier New">RMDIR
+&lt;dirname&gt;</font> 					</li>
+					<li> 						<font face="Courier New">dirname</font> is the name of
+the directory 						to remove. 					</li>
+					<li> 						Verify that <font face="Courier New">dirname</font>
+exists in the current 						directory, and that it is a valid
+directory. 					</li>
+					<li> 						Verify that the directory to which <font
+ face="Courier New">dirname</font> 						refers is empty. <font
+ color="#ff0000">This function fails if the directory 						is not
+empty!</font> 					</li>
+					<li> 						Change the <font face="Courier New">dirname</font>
+directory's FAT cluster 						chain to zeros. 					</li>
+					<li> 						Modify <font face="Courier New">dirname</font>'s
+directory entry to 						reflect that it has been deleted (see 						<a
+ href="lab_fat_help.htm#How%20DOS%20deletes%20files/directories">How
+DOS 						deletes files/directories</a>). 					</li>
+					<li> 						Return 1 after successful deletion of the directory, 0
+for any failure. 					</li>
+				
+        </ul>
+			</li>
+			<li> 				<font face="Courier New">int fdMakeDir(char *dirname)</font>
+				
+        <ul>
+					<li> 						Called by command <font face="Courier New">MKDIR
+&lt;dirname&gt;</font> 					</li>
+					<li> 						This function will create an empty directory named
+						<font face="Courier New">dirname</font>. 					</li>
+					<li> 						Verify that <font face="Courier New">dirname</font> does
+not exist in 						the current directory. 					</li>
+					<li> 						Check for available space on the volume to create the
+directory. 					</li>
+					<li> 						Create an empty directory that contains the two standard
+directory 						<i>pointer</i> entries: dot [.], a "this" directory
+entry pointer to 						the current directory; and double-dot [..], a
+directory entry pointer 						to the parent directory. 					</li>
+					<li> 						Write the entry for <font face="Courier New">dirname</font>
+in the 						current directory.  Make sure that your directories can
+"grow" in 						size, if the cluster that contains the directory is
+full. 					</li>
+					<li> 						Return 1 if the directory was successfully created, 0
+for failure. 					</li>
+				
+        </ul>
+			</li>
+			<li> 				<font face="Courier New">int fdCopyFile(char *sourcefile,
+char *destfile)</font> 				
+        <ul>
+					<li> 						Called by command <font face="Courier New">COPY
+&lt;sourcefile&gt; &lt;destfile&gt;</font> 					</li>
+					<li> 						Copy the file <font face="Courier New">sourcefile</font>
+to a new 						file that has the name <font face="Courier New">destfile</font>.
+					</li>
+					<li> 						<font face="Courier New">sourcefile</font> is assumed to
+be located in 						the current directory. <font face="Courier New">destfile</font>
+should 						be created in the current directory. 					</li>
+					<li> 						Verify that <font face="Courier New">sourcefile</font>
+exists in the 						current directory, and that it is a valid file.
+					</li>
+					<li> 						Verify that <font face="Courier New">destfile</font> is
+a valid file name. 					</li>
+					<li> 						Certify that <font face="Courier New">destfile</font>
+does not exist in 						the current directory. 					</li>
+					<li> 						Check for available space on the volume to perform the
+copy. 						<font color="#ff0000">Fail if there is not enough space!</font>
+					</li>
+					<li> 						Copy the sectors from <font face="Courier New">sourcefile</font>
+to 						<font face="Courier New">destfile</font>. 					</li>
+					<li> 						Write the FAT cluster chain for <font face="Courier New">destfile</font>.
+					</li>
+					<li> 						Write the directory entry for <font face="Courier New">destfile</font>
+in 						the current directory.  Make sure that your directories can
+"grow" in size, 						if the cluster that contains the directory is
+full. 					</li>
+					<li> 						Return 1 after a successful file copy, 0 for any
+failure. 					</li>
+				
+        </ul>
+			</li>
+			<li> 				<font face="Courier New">char* fdGetFat()</font> 				
+        <ul>
+					<li> 						This command returns one of the FAT tables (which you
+will be responsible 						to format before returning) as a character
+array allocated through 						<font face="Courier New">new</font>. 
+This function is invoked by the 						TA FAT Manager to assist you in
+tracking changes to the FAT table during 						execution of your
+shared object. 					</li>
+					<li> 						Allocate memory for the return string.  This memory will
+be deleted by 						<font face="Courier New">fdDelMem</font>, which
+the TA FAT Manager will 						call after it calls this function. 					</li>
+					<li> 						Copy your formatted FAT table into the character array.
+					</li>
+					<li> 						Return the allocated string (using <font
+ face="Courier New">new</font>) 						for success, NULL on failure.
+					</li>
+				
+        </ul>
+			</li>
+		
+    </ul>
+	</li>
+</ol>
+<p><b><a name="Download">Download</a></b></p>
+<ul>
+	<li> 		The TA FAT Manager: <a href="download/ta_fatmanager">ta_fatmanager</a> <br> </li>
+<li> 	Stuart Jansen's FAT Manager: <a href="download/fatmanager">fatmanager</a><br>
+<ul><li>This is an alternate fatmanager written by a former student. </li></ul></li>
+	<li> 		Disk image file (compressed): <a href="download/floppy.zip">floppy.zip</a>
+	</li>
+	<li> 		Some pdf's that may help you: <a href="download/FAT_help.zip">FAT_help.zip</a>
+		(Dr. Cornell hands them out in his section) 	</li>
+    <li>Here is a <a href="download/makefile">makefile</a> primer to help you compile to a shared object.  
+        It is as simply done as possible.  Feel free to make additions.</li>
+    <li>Here is a shared object example to help you with debugging: <a
+    href="download/ta_libfat.so">ta_libfat.so</a>
+</ul>
+<font color = "red"> Remember to hold shift as you click on the files to download, so that Linux doesn't try to open the binaries</font>
+<p><b>Pass-off</b></p>
+<ul>
+	<li> 		Mount the floppy image we have provided, along with your shared object (compiled).  The
+TA who will run the following pass-off script to check all of the
+above requirements.</li>
+  <li>Official Passoff Script for this lab is available here: <a
+ href="download/Offical_FAT1_Passoff_Script.s">Official_FAT1_Passoff_Script.s</a><br>
+  </li>
+	<li> 		<span style="font-weight: bold;">/sbin/fsck.msdos</span> will then
+be run on the floppy image to check the integrity of 		the FAT file system. 	</li>
+</ul>
+<p><b>Extra-credit</b></p>
+You may get extra credit, as determined by your professor, for
+implementation of one or both of the following:
+<ul>
+	<li> 		Copying files into subdirectories. 	</li>
+	<li> 		Implementing support for long file names (see 		<a
+ href="lab_fat_help.htm#Microsoft%27s%20White%20Pages--the%20good%20part">Microsoft's
+		White Pages--the good part</a>). 	</li>
+</ul>
+<p><b><a href="lab_fat_help.htm">Help Index</a></b></p>
+<hr>
+<p align="center"><font size="1">Contributors</font><font size="1">:
+Nathan Hayden, Summer 2003</font></p>
+</body>
+</html>

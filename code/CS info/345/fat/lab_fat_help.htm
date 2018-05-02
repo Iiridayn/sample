@@ -1,0 +1,1106 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <title>MS-DOS FAT File System Lab: Help Index</title>
+</head>
+<body bgcolor="#ffffff">
+<p align="center"><font size="6">MS-DOS<sup>&reg;</sup> FAT File System
+Labs 1 &amp; 2: <a name="Help Index">Help Index</a></font><br>
+<font size="2">[<a href="lab_fat1.htm">Lab description: FAT 1</a>] [<a
+ href="lab_fat2.htm">Lab description: FAT 2</a>]</font></p>
+<br>
+<br>
+<ol>
+	<li>Q&amp;A 		
+    <ul>
+			<li><a href="#Clusters vs. Sectors"> Clusters vs. sectors</a></li>
+			<li><a href="#DOS disk layout">DOS disk layout</a></li>
+			<li><a href="#The boot sector">The boot sector</a></li>
+			<li><a
+ href="#Organization of the file allocation tables (FAT)">Organization
+of the file allocation tables (FAT)</a></li>
+			<li><a
+ href="#FAT-12 file name and extension representation">FAT-12
+file name and extension representation</a></li>
+			<li><a href="#Directory structures and their fields">Directory
+structures and their fields</a></li>
+			<li><a href="#How DOS deletes files/directories">How DOS
+deletes files/directories</a></li>
+		
+    </ul>
+	</li>
+	<li>Programming Resources 		
+    <ul>
+			<li><a href="#Shared Object articles">How to compile a shared
+object</a></li>
+			<li><a href="#Mapping disk data directly to structures">Mapping
+disk data directly to structures</a></li>
+			<li><a href="#Reading and Writing Sectors">Reading
+and Writing Sectors</a></li>
+			<li><a href="#Shared Object with C++">Shared Object with C++
+code</a></li>
+			<li><a
+ href="#Retrieving 12 bit entries from the FAT table">Retrieving
+12-bit entries from the FAT table</a></li>
+			<li><a href="#Formatting and printing directory entries">Formatting
+and printing directory entries</a></li>
+			<li><a href="#Formatting and printing the FAT">Formatting
+and printing the FAT</a></li>
+			<li><a href="#Tracking free space">Tracking free space</a></li>
+			<li><a href="#CHKDSK error message translations">fsck.msdos error
+message translations</a></li>
+		
+    </ul>
+	</li>
+	<li>Programming Extras 		
+    <ul>
+			<li><a href="#Microsoft's White Pages--the good part">Microsoft's
+White Pages--the good part</a></li>
+			<li><a href="#Sample TA FAT Manager commands">Sample TA FAT
+Manager commands</a></li>
+		
+    </ul>
+	</li>
+</ol>
+<hr>
+<p><b>Q&amp;A</b></p>
+<i><a name="Clusters vs. Sectors">Clusters vs. sectors</a></i><br>
+<p>A sector is a fixed division of a track on a disk.<br>
+<img border="0" src="img/fdd.gif" width="148" height="153"><br>
+In the image, the yellow circle represents a single track, and the blue
+segment is a single sector (graphic courtesy of <a
+ href="http://www.howstuffworks.com/hard-disk3.htm">How Stuff Works</a>).
+Sectors are fixed-size (typically 512 bytes on most media) and are the
+basic unit of access for any disk (see <a
+ href="#Reading and Writing to the floppy disk or a disk image">Reading
+and Writing to the floppy disk or a disk image</a>).</p>
+<p>A cluster is one or more contiguous sectors and the fundamental unit
+for DOS files.  The DOS file system only works in terms of clusters.
+The FAT tables index used and unused clusters.  The confusing part is
+that a sector and a cluster are the same size in FAT-12!  So, why not
+just access everything in sectors? The reason is that as disks get
+larger (especially hard disks) the number of sectors grows accordingly.
+FAT tables would then also grow accordingly, however, no one wants a
+huge <i>pair</i> of FAT tables occupying megabytes on their disk.  So,
+depending on the number of sectors on the disk, the FAT file system
+scales the cluster size accordingly to keep the FAT table reasonably
+small. On small disks with relatively few sectors (like a 3.5" floppy
+disk) the cluster size equals the sector size (512 bytes).  Larger disks
+will have more than one sector per cluster, for example, one with a
+capacity of 540MB, would have a cluster size of 16KB (or 32 contiguous
+sectors). The cluster size becomes the <i>minimum</i> file size for
+that system.  In the 540MB disk example, a small text file containing
+only a few bytes of data would fill a cluster (32 sectors, or 16KB)
+because that cluster entry in the FAT table would be marked as filled,
+and the rest of the space in the cluster would be wasted.</p>
+<p>The distinction between FAT-12, FAT-16, and FAT-32 is merely the
+size of one entry in the FAT table.  FAT-12 systems contain 12 bits per
+entry, while FAT-32 systems have 32 bits per entry.  The FAT type is
+solely determined by the number of clusters on the media.</p>
+<p><a href="#Help Index"><font size="1">back to Help Index</font></a></p>
+<hr>
+<p><b>Q&amp;A: <a name="DOS disk layout"><i>DOS disk layout</i></a></b></p>
+<p>An MS-DOS floppy disk layout (FAT-12) consists of four major
+sections: the boot sector, FAT tables, root directory, and data area:<br>
+<img border="0" src="img/disklay.jpg" width="467" height="119"></p>
+<ul>
+	<li> 		<a href="#The boot sector">The boot sector</a> consists 		of
+the first sector (sector 0) on the volume or disk (on 		disks that have
+multiple partitions, this will not <i>always</i> be sector 		0).  The
+boot sector contains specific information about the rest of
+		organization of the file system, including how many copies of the FAT
+tables 		are present, how big a sector is, how many sectors in a
+cluster, etc. 	</li>
+	<li> 	 <a
+ href="#Organization of the file allocation tables (FAT)">FAT
+tables</a> 		are pointers to every cluster on the disk, and indicate the
+number of the 		next cluster in the current cluster chain, the end of
+the cluster chain, 		whether a cluster is empty,  or has errors.  The
+FAT tables are the only 		method of finding the location of files and
+directories on the rest of 		the disk (thus, if the FAT tables become
+corrupted, the data on the disk 		is also essentially lost).  There are
+typically two redundant copies of 		the FAT table on disk for data
+security and recovery purposes. 	</li>
+	<li> 		The Root Directory is the primary directory of the disk.  Unlike
+other 		directories located in the data area of the disk, the root
+directory has 		a finite size (14 sectors * 16 directory entries per
+sector = 224 possible 		entries, see <a
+ href="#Directory structures and their fields">Directory
+		structures and their fields</a> for more details) restricting the total
+		amount of files or directories that can be created therein.  The 		<i>starting
+cluster</i> field in <i>subdirectory</i> directory entries 		that refer
+to the root directory will point to cluster 0. 	</li>
+	<li> 	Data Area.  The first sector of the data area (sector 33)
+corresponds to 		cluster 2 of the file system (the first cluster is <i>always</i>
+cluster 		2).  The data area contains file and directory data and spans
+the 		remaining sectors on the disk. 	</li>
+</ul>
+<p><a href="#Help Index"><font size="1">back to Help Index </font></a> </p>
+<hr>
+<p><b>Q&amp;A: <a name="The boot sector"><i>The boot sector</i></a></b></p>
+<p>The first sector on the volume or disk is the boot sector.  The boot
+sector contains information about the rest of the file system structure.
+You may assume that all disks and image files in this lab will conform
+to the FAT-12 standard.  In the instance that you needed to determine
+for yourself what type of FAT file system you were mounting, and its
+physical layout on the disk, you would need to read and configure your
+program with the values shown in the boot sector. The boot sector
+contains the following values, which are aligned exactly as shown.</p>
+<p><font face="Courier New">unsigned char&nbsp; BS_jmpBoot[3];&nbsp; <font
+ color="#008000">/* Jump instruction to the boot code */</font><br>
+unsigned char&nbsp; BS_OEMName[8];&nbsp; <font color="#008000">/* The
+name of the system that formatted the volume */<br>
+</font>unsigned short BPB_BytsPerSec; <font color="#008000">/* How
+many bytes in a sector (should be 512) */<br>
+</font>unsigned char&nbsp; BPB_SecPerClus; <font color="#008000">/*
+How many sectors are in a cluster (FAT-12 should be 1) */<br>
+</font>unsigned short BPB_RsvdSecCnt; <font color="#008000">/* Number
+of sectors that are reserved (FAT-12 should be 1) */<br>
+</font>unsigned char&nbsp; BPB_NumFATs;&nbsp;&nbsp;&nbsp; <font
+ color="#008000">/* The number of FAT tables on the disk (should be 2)
+*/<br>
+</font>unsigned short BPB_RootEntCnt; <font color="#008000">/* Maximum
+number of directory entries in the root directory */<br>
+</font>unsigned short BPB_TotSec16;&nbsp;&nbsp; <font color="#008000">/*
+FAT-12 total number of sectors on the disk */<br>
+</font>unsigned char&nbsp; BPB_Media;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font
+ color="#008000">/* Code for media type {fixed, removable, etc.} */<br>
+</font>unsigned short BPB_FATSz16;&nbsp;&nbsp;&nbsp; <font
+ color="#008000">/* FAT-12 number of sectors that each FAT table
+occupies (should be 9) */<br>
+</font>unsigned short BPB_SecPerTrk;&nbsp; <font color="#008000">/*
+Number of sectors in one cylindrical track */<br>
+</font>unsigned short BPB_NumHeads;&nbsp;&nbsp; <font color="#008000">/*
+Number of heads for this volume (2 heads on a 1.4Mb 3.5 inch floppy) */<br>
+</font>unsigned long&nbsp; BPB_HiddSec;&nbsp;&nbsp;&nbsp; <font
+ color="#008000">/* Number of preceding hidden sectors (0 for
+non-partitioned media) */<br>
+</font>unsigned long&nbsp; BPB_TotSec32;&nbsp;&nbsp; <font
+ color="#008000">/* FAT-32 number of sectors on the disk (0 for FAT-12)
+*/<br>
+</font>unsigned char&nbsp; BS_DrvNum;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font
+ color="#008000">/* A drive number for the media (OS specific) */<br>
+</font>unsigned char&nbsp; BS_Reserved1;&nbsp;&nbsp; <font
+ color="#008000">/* Reserved space for Windows NT (when formatting, set
+to 0) */<br>
+</font>unsigned char&nbsp; BS_BootSig;&nbsp;&nbsp;&nbsp;&nbsp; <font
+ color="#008000">/* Indicates that the following three fields are
+present (0x29) */<br>
+</font>unsigned long&nbsp;
+BS_VolID;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font color="#008000">/*
+Volume serial number (for tracking this disk) */<br>
+</font>unsigned char&nbsp; BS_VolLab[11];&nbsp; <font color="#008000">/*
+Volume label (matches  label in the root directory, or "NO
+NAME&nbsp;&nbsp;&nbsp; ") */<br>
+</font>unsigned char&nbsp; BS_FilSysType[8];<font color="#008000">/*
+Deceptive FAT type Label that may or may not indicate the FAT type */</font></font></p>
+<p>For a more detailed explanation about each of the fields, and what
+they mean, see <a
+ href="#Microsoft's White Pages--the good part">Microsoft's
+White Pages--the good part</a>).</p>
+<p>For information on reading the boot sector into a structure similar
+to this one, see <a
+ href="#Mapping disk data directly to structures">Mapping
+disk data directly to structures</a>).</p>
+<p><a href="#Help Index"><font size="1">back to Help Index</font></a> </p>
+<hr>
+<p><b>Q&amp;A: <a
+ name="Organization of the file allocation tables (FAT)"><i>Organization
+of the file allocation tables (FAT)</i></a></b></p>
+<p>The FAT-12  tables are organized as a linear array of FAT entries. A
+FAT entry is a single <i>12 bit value</i> whose index matches the
+associated cluster in the data area of the disk. Because the first
+cluster in the data area of the disk corresponds to cluster 2, the <i>first
+two</i> FAT entries in the FAT table are reserved. You can think of the
+FAT table as a large array that contains pointers into the data area of
+the disk. It is also a linked-list of sorts, because you retrieve files
+that are longer than one cluster by referencing the FAT table, which
+points you to the next cluster of that file or directory.<br>
+<img border="0" src="img/fat.gif" width="432" height="316"></p>
+<p>A <i>12-bit</i> FAT entry may have the following values</p>
+<ul>
+	<li> 		<b>0x000</b> Unused cluster. 	</li>
+	<li> 		<b>0xFF0-0xFF6</b> Reserved cluster (like FAT entries 0 and 1). 	</li>
+	<li> 		<b>0xFF7</b> Bad Cluster (contains errors and should not be
+used). 	</li>
+	<li> 		<b>0xFF8-0xFFF</b> End of file/directory, also called EOC (end of
+cluster chain). 	</li>
+	<li> 		<b>other numbers</b> are pointers (indexes) to the next cluster
+in the file/directory. 	</li>
+</ul>
+<p>Cluster chains are a series of FAT entries that point to the next
+cluster in the file/directory, and are terminated by an EOC
+indicator--exactly like linked-lists. For example, in the graphic above,
+the cluster chain for <b>File1.txt</b> is retrieved by starting at the
+first cluster indicated in the directory for that file (the bottom box
+in the above graphic) and following the pointers in the FAT table until
+you encounter the EOC terminator. The chain would comprise clusters 2,
+4, 6, and 7. The cluster chain for <b>MyDir</b> is  3, 5. You know that
+you've reached the end of a file or directory listing when you check
+the corresponding FAT entry for the current cluster, and find that it
+contains the EOC flag.</p>
+<p>When you are modifying and updating the FAT table, <i>make sure</i>
+that you update <i>both</i> copies of the FAT table! One way that <b>fsck.msdos</b>
+verifies the validity of a disk volume is by comparing the FAT tables to
+make sure that they are identical. Any discrepancies will cause a <b>fsck.msdos</b>
+error.</p>
+<p>There are 3072 FAT entries in each FAT table (512 bytes per sector *
+9 sectors = 4608 bytes. 4608 bytes / 1.5 bytes per FAT entry = 3072 FAT
+entries). Be aware that this is a few more entries than the disk has
+clusters; therefore, maximum capacity of the disk should be determined
+by the total number of clusters, not the number of possible FAT table
+entries.</p>
+<p>For a code sample on how to retrieve a <i>12-bit </i>FAT entry
+from a FAT table represented as an array of BYTE, see <a
+ href="#Retrieving 12 bit entries from the FAT table">Retrieving
+12 bit entries from the FAT table</a>).</p>
+<p><a href="#Help Index"><font size="1">back to Help Index</font></a> </p>
+<hr>
+<p><b>Q&amp;A: <a name="FAT-12 file name and extension representation"><i>FAT-12
+file name and extension representation</i></a></b></p>
+<p>File names in DOS traditionally have a limit of 8 characters for the
+name, and 3 characters for the extension (modern FAT file systems allow
+for longer file names--see <a
+ href="#Microsoft's White Pages--the good part">Microsoft's
+White Pages--the good part</a> for details). In your shared object, you
+will need to translate the file names that you are given, into a form
+that you can use to search directory entries (see <a
+ href="#Directory structures and their fields">Directory
+structures and their fields</a>). There are a few things to be aware of:</p>
+<ul>
+	<li> 		File/directory names and extensions are <i>not</i>
+null-terminated 			within the directory entry 	</li>
+	<li> 		File/directory names always occupy 8 bytes--if the
+file/directory name 			is shorter than 8 bytes (characters) pad the
+remaining bytes with 			spaces (ASCII 32, or Hex 0x20). This also
+applies to  3-character 		    extensions. 	</li>
+	<li> 		File/directory names and extensions are <i>always</i> uppercase.
+Always 			convert given file/directory names to uppercase (the TA FAT
+Manager 			will not do this for you). 	</li>
+	<li> 		Directory names can have extensions too. 	</li>
+	<li> 		"FILE1" and "FILE1.TXT" are unique (the extension 		<i>does</i>
+matter). 	</li>
+	<li> 		Files and directories <i>cannot</i> have the same name (even
+though the 			attributes are different). 	</li>
+	<li> 		Do not accept file/directory names longer than 8 characters + 3
+			character extension, unless your DLL will handle long file names. 	</li>
+</ul>
+<p>To see where the filename and extension fit into a directory entry,
+see <a href="#Directory structures and their fields">Directory
+structures and their fields</a>.</p>
+<p>Here are examples of how some file names would translate into the 11
+bytes allocated for the file/directory name and extension in the
+directory entry (white space between quotes should be considered as
+spaces).</p>
+<font face="Courier New"> </font>
+<ul>
+  <font face="Courier New">	<li> 		<u>filename provided</u> [01234567012]
+	</li>
+	<li> 		"foo.bar"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&gt;
+"FOO&nbsp;&nbsp;&nbsp;&nbsp; BAR" 	</li>
+	<li> 		"FOO.BAR"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&gt;
+"FOO&nbsp;&nbsp;&nbsp;&nbsp; BAR" 	</li>
+	<li> 		"Foo.Bar"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&gt;
+"FOO&nbsp;&nbsp;&nbsp;&nbsp; BAR" 	</li>
+	<li>
+		"foo"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&gt;
+"FOO&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; " 	</li>
+	<li>
+		"foo."&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&gt;
+"FOO&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; " 	</li>
+	<li> 		"PICKLE.A"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&gt; "PICKLE&nbsp;
+A&nbsp; " 	</li>
+	<li> 		"prettybg.big"&nbsp;-&gt; "PRETTYBGBIG" 	</li>
+	<li>
+		".big"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-&gt; <i>illegal</i>!
+file/directory names cannot begin with a "." 	</li>
+  </font>
+</ul>
+<p><a href="#Help Index"><font size="1">back to Help Index</font></a> </p>
+<hr>
+<p><b>Q&amp;A: <a name="Directory structures and their fields"><i>Directory
+structures and their fields</i></a></b></p>
+<p>A directory entry contains all of the information necessary to
+reference the contents of a file or directory on the volume, including
+additional information about the file/directory's attributes and other
+information including: time of creation/modification, date created, and
+size of the file (in bytes). All of this information is packed into a
+small 32-byte structure. Directories with more than 16 entries require
+more than one sector (maximum entries per sector = 512 bytes per sector
+/ 32 bytes per directory entry = 16 directory entries).</p>
+<p>Directories in the data area of the disk can be of any length
+(number of sectors). However, because the root directory is of fixed
+size, only a set number of directory entries will fit (see <a
+ href="#DOS disk layout">DOS disk layout</a>).</p>
+<p>Subdirectories--directories other than the root directory--also
+contain two directory entries by default. These are the dot [.] and
+dotdot [..] entries--you have probably seen these before. These entries
+are simply pointers, the first [dot] points to the current directory,
+kind of like the "this" pointer in C++. The second entry [dotdot] is a
+pointer to the parent directory. This is the directory that you are
+specifying with the command "<font face="Courier New">CD ..</font>".&nbsp;
+A directory that includes these two entries is <i>still</i> considered
+empty.</p>
+<p>A directory entry contains the following fields:<br>
+<font face="Courier New"> unsigned char&nbsp;
+Name[8];&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font color="#008000">/* File
+name in capital letters.&nbsp;Padded with spaces, not NULL
+terminated.&nbsp;*/<br>
+</font> unsigned char&nbsp; Extension[3]; <font color="#008000">/*
+Extension in capital letters. Also padded with spaces. There is no '.'
+separator. The '.' is added for readability when filenames with
+extensions are displayed */<br>
+</font> unsigned char&nbsp; Attributes;&nbsp;&nbsp; <font
+ color="#008000">/* Holds the attributes code */<br>
+</font> unsigned char&nbsp; Reserved[10]; <font color="#008000">/*
+Reserved for Windows NT. <u>Set to zero when creating files/directories</u><i>.
+*/</i><br>
+</font> unsigned short
+Time;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font
+ color="#008000">/* Time of last write (file/dir creation is a write) */<br>
+</font> unsigned short
+Date;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font
+ color="#008000">/* Date of last write */<br>
+</font> unsigned short startCluster; <font color="#008000">/* Pointer
+to the first cluster of the file. */<br>
+</font> unsigned long&nbsp; fileSize;&nbsp;&nbsp;&nbsp;&nbsp; <font
+ color="#008000">/* File size in bytes. Make sure this is updated when
+the file is modified */</font></font></p>
+<p>For some additional information regarding the file name and
+extension fields, see <a
+ href="#FAT-12 file name and extension representation">FAT-12
+file name and extension representation</a>. For information on
+formatting a directory entry as a string, see <a
+ href="#Formatting and printing directory entries">Formatting
+and printing directory entries</a>. The file/directory's attributes can
+have the following values. Consider using <font face="Courier New">#define</font>
+for these within your shared object.</p>
+<font face="Courier New"><b>
+<ul>
+	<li> 		#define READ_ONLY 0x01 	</li>
+	<li> 		#define HIDDEN&nbsp;&nbsp;&nbsp; 0x02 	</li>
+	<li> 		#define SYSTEM&nbsp;&nbsp;&nbsp; 0x04 	</li>
+	<li> 		#define VOLUME&nbsp;&nbsp;&nbsp; 0x08 <font color="#008000">//
+this is the volume label entry</font> 	</li>
+	<li> 		#define DIRECTORY 0x10 	</li>
+	<li> 		#define ARCHIVE&nbsp;&nbsp; 0x20 <font color="#008000">// same
+as file</font> 	</li>
+</ul>
+</b></font>
+<p>For example, a file with read-only, hidden, system, and archive
+attributes set might be created by using the bitwise OR operator.<br>
+<font face="Courier New">unsigned short attributes = 0x00;<br>
+attributes = READ_ONLY | HIDDEN | SYSTEM | ARCHIVE; <font
+ color="#008000">// combine these attributes; result is 0x27</font></font></p>
+<p>The directory and archive attributes are mutually exclusive--a file
+can not be both a directory and archived at the same time. The only way
+to distinguish a file from a directory is by checking the attribute.</p>
+<p>For subdirectories that refer back to the root directory, the <font
+ face="Courier New">startCluster</font> value will be 0. Note that
+cluster 0 is reserved in the FAT table--attempting to look up that value
+should result in an error. You must provide a check that will re-direct
+a <font face="Courier New">startCluster</font> of zero to the root
+directory.</p>
+<p>When creating directory entries for new files that have nothing in
+them (a <font face="Courier New">fileSize</font> of 0), the <font
+ face="Courier New">startCluster</font> should <i>always</i> be set to
+0; otherwise <b>fsck.msdos</b> will report an error. Just remember to change
+the <font face="Courier New">startCluster</font> to the correct cluster
+after you have written to the file.</p>
+<p>Ensure that all directory entries in either the root directory or the
+directory sector you are working with have the first byte of the entry set to
+either zero or <b>0xe5</b>.  When <b>fsck.msdos</b> is run on your image, it
+runs down the directory entries sequentially until it encounters a zero in the
+first byte.  If no zeros are encountered it will interpret every directory in
+the root directory space or sector directory space as valid.  This can be bad
+news if your sector contains uninitialized data with a non-zero entry in the
+first byte of the entry.  Note that the image that you have actually does have
+information written in the root directory.  Be sure not to overwrite valid
+data when you intialize your directory entries. 
+no </p>
+<p><a href="#Help Index"><font size="1">back to Help Index</font></a></p>
+<hr>
+<p><b>Q&amp;A: <a name="How DOS deletes files/directories"><i>How DOS
+deletes files/directories</i></a></b></p>
+<p>As you may know, DOS does not immediately <i>erase</i> a file or
+directory when it is deleted. In fact, it does nothing to the clusters
+that contain the information (this is why it is sometimes possible to
+un-delete something). However, DOS <i>does</i> zero out the
+file/directory's cluster chain from the FAT table (see <a
+ href="#Organization of the file allocation tables (FAT)">Organization
+of the file allocation tables (FAT)</a>), and places a special
+character (0xe5) in the first byte of the directory entry (see <a
+ href="#Directory structures and their fields">Directory
+structures and their fields</a>), signaling that this entry has been
+deleted. You will need to do the same when a file or directory is
+deleted. Start with the cluster indicated in the directory entry,
+traverse the cluster chain, and set each FAT entry to zero including the
+EOC entry.</p>
+<p>The special code <b>0xe5</b> (as a character, this is a lower-case <b>a</b>
+with a circle above it) located in the first byte of a directory entry,
+indicates that this directory entry is free, and may be overwritten with
+a new entry in the future. Place this value in the first byte of the
+directory entry to effectively delete it (it will be the first character
+of the file/directory name field). When reading directory entries,
+ignore all entries that begin with <b>0xe5</b> (see <a
+ href="#Formatting and printing directory entries">Formatting
+and printing directory entries</a>).</p>
+<p><a href="#Help Index"><font size="1">back to Help Index</font></a></p>
+<hr>
+<p><b>Programming Resources: <a name="Shared Object articles"><i>How
+to compile a shared object</i></a></b></p>
+<p>For an excellent set of short articles about Shared Objects, how to
+create and interface with them, we refer you to <a
+ href="http://www.linux-mag.com/2002-04/compile_01.html"> this Linux
+Magazine article</a>. For a decent longer article about Shared Objects,
+we refer you to <a
+ href="http://www-106.ibm.com/developerworks/library/l-shobj/"> this IBM
+website article</a>.</p>
+<p>You will need to add one thing to your code that neither of these
+pages state, if you are planning on using C++ in your solution instead
+of just C. <a href="#Shared Object with C++">Shared Object with
+C++</a></p>
+<p><a href="#Help Index"><font size="1">back to Help Index</font></a></p>
+<hr>
+<p><b>Programming Resources: <a
+ name="Mapping disk data directly to structures"><i>Mapping disk data
+directly to structures</i></a></b></p>
+<p>In many instances in this lab, you may desire to copy a set amount
+of bytes from the floppy disk, and transfer them directly into a
+structure that has the appropriate fields already defined. For example,
+the boot sector of the disk contains raw data that can easily be
+transferred into an appropriate structure (see <a
+ href="#The boot sector">The boot sector</a>). Another example is
+one of the 32-byte directory entries in a sector (see <a
+ href="#Directory structures and their fields">Directory
+structures and their fields</a>). For memory transfers where you wish to
+align the <i>bits</i> inside of a byte into structured fields, a <i>bit
+field</i> is appropriate (see <a
+ href="lab_intro_help.htm#Creating bit fields">Creating bit fields</a>).
+However, for structures that <i>are</i> aligned on unsigned char,
+unsigned short, or unsigned long boundaries (see <a
+ href="#BYTE, WORD, and DWORD">unsigned char, unsigned short, and
+unsigned long</a>), you can simply copy the memory via <b>memcpy</b>
+(see <font face="Courier New">man memcpy</font>) into the appropriate
+structure.</p>
+<p>There is one catch. In order to map the disk data to a structure you
+must make sure that <i>the structure</i> is byte aligned in memory. When
+a compiler allocates storage space for items in a structure, it may
+allocate extra space in between the item elements (padding). Disks
+don't do that. Two directives will force the compiler's alignment of
+your structures to be aligned in memory.</p>
+<font face="Courier New">
+<ul>
+	<li> 		<b>#pragma pack(push, 1)</b> <font color="#008000">// Structures
+following this directive are BYTE aligned in memory (no padding).</font> 	</li>
+	<li> 		<b>#pragma pack(pop)</b> <font color="#008000">// End of strict
+alignment.</font> 	</li>
+</ul>
+</font>
+<p>Surround your structure definitions with these pre-processor
+directives, and they will be ready to receive the disk data through a
+simple <b>memcpy</b>. The following example illustrates copying the
+boot sector into a structure preceded and followed by the above
+pre-processor directives, named <font face="Courier New">BootStruct</font>.<br>
+<font face="Courier New"><br>
+BootStruct my_boot_sec;&nbsp;&nbsp;&nbsp; <font color="#008000">// The
+BYTE-aligned structure.</font><br>
+unsigned char first_sector[512];&nbsp;&nbsp;&nbsp; <font
+ color="#008000">// buffer to hold the first sector (boot sector).<br>
+/* Read in the disk sector into the buffer "first_sector" */</font><br>
+memcpy(&amp;my_boot_sec, first_sector, sizeof(BootStruct)) </font></p>
+<p><a href="#Help Index"><font size="1">back to Help Index </font></a> </p>
+<hr>
+<p><b>Programming Resources: <a
+ name="Reading and Writing Sectors"><i>Reading
+and Writing Sectors</i></a></b></p>
+<p>You will use the functions <font face="Courier New">open, read,
+write,</font> and <font face="Courier New">lseek</font> to write data to
+and from a floppy disk or disk image.</p>
+<p>We highly recommend you use the functions given to you in the book for reading and writing an entire sector.
+You can find the code in order to do this on pages 199-200 of the NUTT book <a href="readwrite.html">NEW LINK!! Click here for book reference</a>.  Be sure you understand what these
+functions are doing.  Essentially, these functions allow you to specify the sector you would like to read from 
+or write to simply by specifying a sector number, and providing a buffer (char*).</p>
+<p><a href="#Help Index"><font size="1">back to Help Index</font></a></p>
+<hr>
+<p><b>Programming Resources: <a name="Shared Object with C++"><i>Shared
+Object with C++</i></a></b></p>
+<p>Unless you are a really strange guy (I know a few), you will most
+likely be writing the majority of your code for this lab using C++. The
+problem being that gcc (the compiler we use) likes to change the names
+of C++ functions in really strange ways when compiling them into a
+shared object.  In order to avoid causing this problem, we suggest the
+following changes to your code:</p>
+<font face="Courier New"> <br>
+fatlab myfat;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008000">//this is
+your class that has the implementation of all of the functions</font><br>
+<br>
+extern "C"&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008000">//This is a
+funny thing that makes sure that they all have the same names</font><br>
+<br>
+{&nbsp;&nbsp;&nbsp;&nbsp;<font color="#008000">//Put all functions that
+require the same name to stay inside of squiggly braces</font><br>
+<br>
+&nbsp;&nbsp;int fdLoadMntPt(char * mountname)<br>
+&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;return
+myfat.fdLoadMntPt(mountname);&nbsp;&nbsp;&nbsp;&nbsp;<font
+ color="#008000">//all I do is call and return my appropriate class
+functions!</font><br>
+&nbsp;&nbsp;}<br>
+<br>
+&nbsp;&nbsp;char * fdListDir()<br>
+&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;return myfat.fdListDir();<br>
+&nbsp;&nbsp;}<br>
+<br>
+&nbsp;&nbsp;int fdDelMem(char * str)<br>
+&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;return myfat.fdDelMem(str);<br>
+&nbsp;&nbsp;}<br>
+<br>
+&nbsp;&nbsp;int fdChangeDir(char * dir)<br>
+&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;return myfat.fdChangeDir(dir);<br>
+&nbsp;&nbsp;}<br>
+<br>
+&nbsp;&nbsp;int fdEraseFile(char * filename)<br>
+&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;return myfat.fdEraseFile(filename);<br>
+&nbsp;&nbsp;}<br>
+<br>
+&nbsp;&nbsp;int fdDelDir(char * dirname)<br>
+&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;return myfat.fdDelDir(dirname);<br>
+&nbsp;&nbsp;}<br>
+<br>
+&nbsp;&nbsp;int fdMakeDir(char * dirname)<br>
+&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;return myfat.fdMakeDir(dirname);<br>
+&nbsp;&nbsp;}<br>
+<br>
+&nbsp;&nbsp;int fdCopyFile(char * sourcefile, char * destfile)<br>
+&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;return myfat.fdCopyFile(sourcefile, destfile);<br>
+&nbsp;&nbsp;}<br>
+<br>
+&nbsp;&nbsp;char * fdGetFat()<br>
+&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;return myfat.fdGetFat();<br>
+&nbsp;&nbsp;}<br>
+<br>
+&nbsp;&nbsp;int fdOpenFile(char * filename, int mode)<br>
+&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;return myfat.fdOpenFile(filename, mode);<br>
+&nbsp;&nbsp;}<br>
+<br>
+&nbsp;&nbsp;int fdCloseFile(int fHandleIndex)<br>
+&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;return myfat.fdCloseFile(fHandleIndex);<br>
+&nbsp;&nbsp;}<br>
+<br>
+&nbsp;&nbsp;int fdReadFile(int fHandleIndex, char * buffer, int length)<br>
+&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;return myfat.fdReadFile(fHandleIndex, buffer,
+length);<br>
+&nbsp;&nbsp;}<br>
+<br>
+&nbsp;&nbsp;int fdWriteFile(int fHandleIndex, char * buffer, int length)<br>
+&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;return myfat.fdWriteFile(fHandleIndex, buffer,
+length);<br>
+&nbsp;&nbsp;}<br>
+<br>
+&nbsp;&nbsp;int fdSeek(int fHandleIndex, int location)<br>
+&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;return myfat.fdSeek(fHandleIndex, location);<br>
+&nbsp;&nbsp;}<br>
+}<br>
+<br>
+</font>
+<p><a href="#Help Index"><font size="1">back to Help Index</font></a></p>
+<hr>
+<p><b>Programming Resources: <a
+ name="Retrieving 12 bit entries from the FAT table"><i>Retrieving
+12-bit entries from the FAT table</i></a></b></p>
+<p>The FAT-12 table consists of an array of 12-bit entries that
+correspond to clusters in the data area of the disk (see <a
+ href="#Organization of the file allocation tables (FAT)">Organization
+of the file allocation tables (FAT)</a>). Retrieving a single FAT
+entry, is slightly complicated because we can't easily create a data
+structure of 12-bit or 1.5 unsigned char entries (see <a
+ href="#BYTE, WORD, and DWORD">unsigned char, unsigned short, and
+unsigned long</a>). You may store the FAT table any way you wish, but
+the following code sample assumes that you've chosen to store the FAT
+table in an array of unsigned chars. Because we chose this, we will
+need to grab an entire unsigned short that covers the 12-bit FAT entry,
+with four bits to spare, and then extract just the 12 bits that we want
+(either the high-order or low-order bits, depending on whether the
+original FAT index was even or odd). The functions for retrieving and
+setting a FAT entry are provided below.</p>
+<p><font color="#ff0000">In the functions, the variable <font
+ face="Courier New">FAT</font> is the array of unsigned char containing
+the FAT table.</font></p>
+<ul>
+	<li><b>GetFatEntry</b> Takes an index into the FAT table, and returns a
+unsigned short containing the 12-bit FAT entry code.<br>
+		<font face="Courier New">unsigned short GetFatEntry(int FATindex)<br>
+		{<br>
+		&nbsp;&nbsp; unsigned short FATEntryCode;&nbsp;&nbsp;&nbsp; <font
+ color="#008000">// The return value<br>
+    </font> 		&nbsp;&nbsp; int FatOffset = ((FATindex * 3) /
+2);&nbsp;&nbsp;&nbsp; <font color="#008000">// Calculate the offset of
+the unsigned short to get<br>
+    </font> 		&nbsp;&nbsp; if (FATindex % 2 == 1)&nbsp;&nbsp;&nbsp; <font
+ color="#008000">// If the index is odd<br>
+    </font> 		&nbsp;&nbsp; {<br>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FATEntryCode = *((unsigned short *)
+&amp;FAT[FatOffset]);&nbsp;&nbsp;&nbsp; <font color="#008000">// Pull
+out a unsigned short from a unsigned char array<br>
+    </font> 		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FATEntryCode &gt;&gt;=
+4;&nbsp;&nbsp;&nbsp;<font color="#008000">// Extract the high-order 12
+bits<br>
+    </font> 		&nbsp;&nbsp; }<br>
+		&nbsp;&nbsp; else&nbsp;&nbsp;&nbsp; <font color="#008000">// If the
+index is even<br>
+    </font> 		&nbsp;&nbsp; {<br>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FATEntryCode = *((unsigned short *)
+&amp;FAT[FatOffset]);&nbsp;&nbsp;&nbsp; <font color="#008000">// Pull
+out a unsigned short from a unsigned char array<br>
+    </font> 		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FATEntryCode &amp;=
+0x0fff;&nbsp;&nbsp;&nbsp; <font color="#008000">// Extract the
+low-order 12 bits<br>
+    </font> 		&nbsp;&nbsp; }<br>
+		&nbsp;&nbsp; return FATEntryCode;<br>
+		}</font></li>
+	<li><b>SetFatEntry</b> Takes an index into the FAT table, and a
+unsigned short containing the 12-bit value to insert at that location. 		<font
+ color="#ff0000">This function only writes the <font face="Courier New">FAT12ClusEntryVal</font>
+to <i>one</i> of the FAT 		tables! Make sure that you update <i>both</i>
+FAT tables on disk.</font><br>
+		<font face="Courier New">void SetFatEntry(int FATindex, unsigned
+short FAT12ClusEntryVal)<br>
+		{<br>
+		&nbsp;&nbsp; int FATOffset = ((FATindex * 3) / 2);&nbsp; <font
+ color="#008000">// Calculate the offset of the unsigned short to write<br>
+    </font> 		&nbsp;&nbsp; if (FATindex % 2 == 0)&nbsp;&nbsp;&nbsp; <font
+ color="#008000">// If the index is even<br>
+    </font> 		&nbsp;&nbsp; {<br>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FAT12ClusEntryVal &amp;= 0x0FFF; <font
+ color="#008000">// Certify that we passed in no extraneous high-order
+bits<br>
+    </font> 		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *((unsigned short
+*)&amp;FAT[FATOffset]) = (*((unsigned short*)&amp;FAT[FATOffset])) &amp;
+0xF000; <font color="#008000">// Clear the bits<br>
+    </font> 		&nbsp;&nbsp; }<br>
+		&nbsp;&nbsp; else<br>
+		&nbsp;&nbsp; {<br>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FAT12ClusEntryVal &lt;&lt;=
+4;&nbsp;&nbsp;&nbsp; <font color="#008000">// Shift our given value
+into the high-order 12-bits<br>
+    </font> 		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; *((unsigned short
+*)&amp;FAT[FATOffset]) = (*((unsigned short*)&amp;FAT[FATOffset])) &amp;
+0x000F; <font color="#008000">// Clear the bits<br>
+    </font> 		&nbsp;&nbsp; }<br>
+		&nbsp;&nbsp; <font color="#008000">// Assign the FAT entry value
+into the unsigned char array...<br>
+    </font> 		&nbsp;&nbsp; *((unsigned short *)&amp;FAT[FATOffset]) =
+(*((unsigned short *)&amp;FAT[FATOffset])) | FAT12ClusEntryVal;<br>
+		}</font></li>
+</ul>
+<p><a href="#Help Index"><font size="1">back to Help Index</font></a></p>
+<hr>
+<p><b>Programming Resources: <a
+ name="Formatting and printing directory entries"><i>Formatting and
+printing directory entries</i></a></b></p>
+<p>According to the MS-DOS white pages (see <a
+ href="#Microsoft's White Pages--the good part">Microsoft's
+White Pages--the good part</a>), a directory entry whose first byte (the
+first byte of the file name) starts with <b>0xe5</b> is considered a <i>deleted
+entry</i>, and should not be printed. Also, an entry whose first byte
+starts with <b>0x00</b> indicates that this directory entry is empty <i>and</i>
+that none of the directory entries following that entry are valid.</p>
+<p>The following function example takes a directory entry structure, in
+this case named <font face="Courier New">DirEntry</font> (also defined
+below), and returns a formatted string outputting all of the fields. The
+structure <font face="Courier New">DirEntry</font> and its companion
+structures are all BYTE aligned with <b>#pragma</b> (see <a
+ href="#Mapping disk data directly to structures">Mapping
+disk data directly to structures</a>).</p>
+<ul>
+	<li>Bit Field structure that will receive the time (see <a
+ href="lab_vm_help.htm#bitfields">Creating 		bit fields</a> for more
+information):<br>
+		<font face="Courier New">#pragma pack(push, 1) <font color="#008000">//
+align the following code exactly...<br>
+    </font><br>
+		struct fattime<br>
+		{<br>
+		&nbsp;&nbsp; unsigned short sec: 5; <font color="#008000">//
+low-order 5 bits are the seconds<br>
+    </font> 		&nbsp;&nbsp; unsigned short min: 6; <font color="#008000">//
+next 6 bits are the minutes<br>
+    </font> 		&nbsp;&nbsp; unsigned short hour:5; <font color="#008000">//
+high-order 5 bits are the hour (total 16 bits--a unsigned short)<br>
+    </font> 		};</font> 	</li>
+	<li>Bit Field structure that will receive the date:<br>
+		<font face="Courier New">struct fatdate<br>
+		{<br>
+		&nbsp;&nbsp; unsigned short day:&nbsp; 5; <font color="#008000">//
+low-order 5 bits are the day<br>
+    </font> 		&nbsp;&nbsp; unsigned short month:4; <font color="#008000">//
+next 4 bits are the month <br>
+    </font> 		&nbsp;&nbsp; unsigned short year: 7; <font color="#008000">//
+high-order 7 bits are the year (total 16 bits--a unsigned short)<br>
+    </font> 		};</font> 	</li>
+	<li>32-byte directory entry structure:<br>
+		<font face="Courier New">struct DirEntry<br>
+		{<br>
+		&nbsp;&nbsp; unsigned char&nbsp;
+Name[8];&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font color="#008000">// The
+file name.&nbsp;Padded with spaces, not NULL terminated.&nbsp;<br>
+    </font> 		&nbsp;&nbsp; unsigned char&nbsp; Extension[3]; <font
+ color="#008000">// The extension.&nbsp;It is also padded with
+spaces.&nbsp;No '.' separator.<br>
+    </font> 		&nbsp;&nbsp; unsigned char&nbsp; Attributes;&nbsp;&nbsp; <font
+ color="#008000">// Holds the attributes code<br>
+    </font> 		&nbsp;&nbsp; unsigned char&nbsp; Reserved[10]; <font
+ color="#008000">// Reserved bytes for Windows NT. Zero when creating
+directories.<br>
+    </font> 		&nbsp;&nbsp; unsigned short&nbsp;
+Time;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font
+ color="#008000">// Time of last write (file/dir creation is a write)<br>
+    </font> 		&nbsp;&nbsp; unsigned short&nbsp;
+Date;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font
+ color="#008000">// Date of last write<br>
+    </font> 		&nbsp;&nbsp; unsigned short&nbsp; startCluster; <font
+ color="#008000">// Pointer to the first cluster of the file.<br>
+    </font> 		&nbsp;&nbsp; unsigned long
+fileSize;&nbsp;&nbsp;&nbsp;&nbsp; <font color="#008000">// File size in
+bytes. Make sure this is updated if modifying<br>
+    </font> 		};<br>
+		<br>
+		#pragma pack(pop) <font color="#008000">// Resume standard "packing"</font></font>
+	</li>
+	<li>PrintDirectoryEntry function takes a directory entry <font
+ face="Courier New">dirent</font> 		and a pre-allocated character array <font
+ face="Courier New">return_string</font> (100 		is a good size for it),
+and fills in the array with a single formatted directory entry.<br>
+		<font face="Courier New">void PrintDirectoryEntry(DirEntry dirent,
+char *return_string)<br>
+		{<br>
+		&nbsp;&nbsp; char  tempstring[10];<br>
+		&nbsp;&nbsp; fatdate d;&nbsp; <font color="#008000">// The Date bit
+field structure<br>
+    </font> 		&nbsp;&nbsp; fattime t;&nbsp; <font color="#008000">//
+The Time bit field structure<br>
+    </font> 		&nbsp;&nbsp;
+strncpy(tempstring,(char*)&amp;dirent.Name,8);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font
+ color="#008000">// Copies 8 bytes from the name<br>
+    </font> 		&nbsp;&nbsp; tempstring[8] =
+0;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font
+ color="#008000">// Null terminate it</font><br>
+		&nbsp;&nbsp;
+sprintf(return_string,"%s\t",tempstring);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font
+ color="#008000">// inserts the name into the string</font><br>
+		&nbsp;&nbsp; strncpy(tempstring,(char*)&amp;dirent.Extension,3); <font
+ color="#008000">// Copies 3 bytes from the extension</font><br>
+		&nbsp;&nbsp; tempstring[3] =
+0;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font
+ color="#008000">// Null terminate it</font><br>
+		&nbsp;&nbsp;
+sprintf(return_string,"%s%s\t",return_string,tempstring); <font
+ color="#008000">// insert the extension...</font><br>
+		&nbsp;&nbsp; <font color="#008000">// Generate the attributes</font><br>
+		&nbsp;&nbsp; if(dirent.Attributes
+&amp;0x01){strcat(return_string,"R");} else {strcat(return_string,"-");}<br>
+		&nbsp;&nbsp; if(dirent.Attributes
+&amp;0x02){strcat(return_string,"H");} else {strcat(return_string,"-");}<br>
+		&nbsp;&nbsp; if(dirent.Attributes
+&amp;0x04){strcat(return_string,"S");} else {strcat(return_string,"-");}<br>
+		&nbsp;&nbsp; if(dirent.Attributes
+&amp;0x08){strcat(return_string,"V");} else {strcat(return_string,"-");}<br>
+		&nbsp;&nbsp; if(dirent.Attributes
+&amp;0x10){strcat(return_string,"D");} else {strcat(return_string,"-");}<br>
+		&nbsp;&nbsp; if(dirent.Attributes
+&amp;0x20){strcat(return_string,"A\t");}else{strcat(return_string,"-\t");}<br>
+		&nbsp;&nbsp; <font color="#008000">// Extract the time and format it
+into the string...</font><br>
+		&nbsp;&nbsp; memcpy(&amp;t,&amp;dirent.Time,sizeof(unsigned short));<br>
+		&nbsp;&nbsp;
+sprintf(return_string,"%s%02d:%02d:%02d\t",return_string,t.hour,t.min,t.sec*2);<br>
+		&nbsp;&nbsp; <font color="#008000">// Extract the date and format it
+as well, inserting it into the string...</font><br>
+		&nbsp;&nbsp; memcpy(&amp;d,&amp;dirent.Date,sizeof(unsigned short));<br>
+		&nbsp;&nbsp; sprintf(return_string,"%s%02d/%02d/%04d\t%d\t%d\r\n",
+return_string, d.month, d.day,<br>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+d.year+1980, dirent.startCluster, dirent.fileSize);<br>
+		&nbsp;&nbsp; <br>
+		&nbsp;&nbsp; <font color="#008000">// return_string is now ready!</font><br>
+		}</font> 	</li>
+</ul>
+<p><a href="#Help Index"><font size="1">back to Help Index</font></a></p>
+<hr>
+<p><b>Programming Resources: <a name="Formatting and printing the FAT"><i>Formatting
+and printing the FAT</i></a></b></p>
+<p>The following function shows one method of formatting the FAT table
+for easy viewing. This function organizes the FAT table into  10
+columns. It relies on the helper function <font face="Courier New">GetFatEntry</font>
+that retrieves a FAT table entry when given an index into the FAT table
+(see <a
+ href="#Retrieving 12 bit entries from the FAT table">Retrieving
+12 bit entries from the FAT table</a>). It returns the FAT table as a
+dynamically-allocated character array attached to the pointer <font
+ face="Courier New">fattable</font>. This is only an example; you may
+choose to format the FAT any way you wish.</p>
+<ul>
+	<li><b>RetrieveFatTable</b> returns a string dynamically allocated
+		that contains the formatted FAT table in it.<br>
+		<font face="Courier New">char* RetrieveFatTable()<br>
+		{<br>
+		&nbsp;&nbsp; char *fattable = new char[200];<br>
+		&nbsp;&nbsp; char buffer[100], endline[100];<br>
+		&nbsp;&nbsp; int fatvalue;<br>
+		&nbsp;&nbsp; sprintf(fattable," &nbsp; &nbsp;
+%5d%5d%5d%5d%5d%5d%5d%5d%5d%5d\r\n",0,1,2,3,4,5,6,7,8,9);<br>
+&nbsp; &nbsp;sprintf(fattable,"%s &nbsp; &nbsp; </font><font
+ face="Courier New">+--------------------------------------------------\r\n%4d
+|", fattable, 0);</font><font face="Courier New"><br>
+		&nbsp;&nbsp; int size = (512*9) / 1.5; <font color="#008000">// The
+number of fat entries in the FAT table<br>
+    </font> 		&nbsp;&nbsp; for (int i=0;i&lt;size;i++)<br>
+		&nbsp;&nbsp; {<br>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; fatvalue = GetFATentry(i);<br>
+		<font color="#008000">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // Special
+formatting cases...</font><br>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if (i &lt; 2) <font color="#008000">//
+A reserved cluster</font><br>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sprintf(buffer, "
+RSRV");<br>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; else if (fatvalue == 4095) <font
+ color="#008000"> // The EOC marker</font><br>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sprintf(buffer, "
+&nbsp;EOC");<br>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; else if (fatvalue == 4087) <font
+ color="#008000"> // The BAD cluster marker</font><br>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sprintf(buffer, "
+&nbsp;BAD");<br>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; else<br>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+sprintf(buffer,"%5d", fatvalue);<br>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if ((i + 1) % 10 == 0) <font
+ color="#008000">// If the NEXT item will be a multiple of 10, then
+wrap it<br>
+    </font> 		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {<br>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sprintf(endline,
+"\r\n%4d |",i+1);<br>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; strcat(buffer,
+endline);<br>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }<br>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font color="#008000">// Transfer the
+current string into a string that is just bigger, cleaning up memory...</font><br>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; char *templonger = new
+char[strlen(fattable) + strlen(buffer)+1];<br>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; strcpy(templonger, fattable);<br>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; strcat(templonger, buffer);<br>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; delete [] fattable;<br>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; fattable = new
+char[strlen(templonger)+1];<br>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; strcpy(fattable, templonger);<br>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; delete [] templonger;<br>
+		&nbsp;&nbsp; }<br>
+		&nbsp;&nbsp; return fattable;<br>
+		}</font> 	</li>
+</ul>
+<p><a href="#Help Index"><font size="1">back to Help Index</font></a></p>
+<hr>
+<p><b>Programming Resources: <a name="Tracking free space"><i>Tracking
+free space</i></a></b></p>
+<p>In the MS-DOS FAT file system, there is no structure or system that
+keeps track of how much free space is available on the disk (FAT-32
+volumes attempt to help you with this by providing a last-known free
+space variable). Thus, in order to manage this information yourself, you
+have several choices.</p>
+<ul>
+	<li>Sum up the number of free clusters on the disk when it is first
+		mounted, place that value in some variable, and then just keep track
+		of every new FAT table entry allocated and deleted throughout the
+		life of your program (assuming that you are the only one that is
+		accessing the drive, you'll be fine). 	</li>
+	<li>Create a free-space bitmap, similar to the one explained in
+Stallings, 		chapter 12, page 549, that associates a bit to each cluster
+in 		the FAT table. 	</li>
+	<li>Implement your own creative method!</li>
+</ul>
+<p><a href="#Help Index"><font size="1">back to Help Index</font></a></p>
+<hr>
+<p><b>Programming Resources: <a
+ name="CHKDSK error message translations"><i>fsck.msdos error message
+translations</i></a></b></p>
+<p>Students from past semesters have reported a few <b>fsck.msdos</b> error
+messages and their common causes. These are summarized below.</p>
+<ul>
+	<li><b>lost chains</b> - you probably were doing a deletion of 		a file
+or directory, and removed the actual directory entry for 		that
+file/directory, but forgot to zero out the associated cluster 		chain of
+that file/directory from the FAT table (see 		<a
+ href="#How DOS deletes files/directories">How DOS deletes
+		files/directories</a>). 	</li>
+	<li><b>cross-linked chains</b> - file and directory chains in 		the FAT
+table may only belong to one file or directory. If 		<b>fsck.msdos</b>
+detects that two entries in the FAT table are 		"pointing" to the same
+cluster, then you have 		cross-linked chains somewhere. This probably
+means that 		you forgot to delete a cluster chain somewhere, and then
+		you created a new file or directory that points to the 		same cluster
+as the previously (not-quite-deleted) cluster 		chain. 	</li>
+	<li><b>unrecognized extended attribute handle</b> - When you 		created
+a new directory or file, you didn't zero out the 		contents of the
+"reserved" field (see 		<a
+ href="#Directory structures and their fields">Directory
+		structures and their fields</a>). 	</li>
+	<li><b>unrecoverable error in folder...</b> - The dot [.] and 		dotdot
+[..] directory entries in a new directory created 		with MKDIR were
+padded with zeros instead of spaces 		(<b>0x00</b> when they should have
+been <b>0x20</b>) 		(see <a
+ href="#FAT-12 file name and extension representation">FAT-12
+		file name and extension representation</a>). 	</li>
+	<li><b>first allocation unit is not valid. The entry will be
+		truncated</b> - When seeking past the end of a file, you have 		not
+properly allocated more space, in the case that the file 		has a start
+cluster of 0 and a size of 0. Make sure to adjust 		the file size field <i>and</i>
+find a suitable cluster to place 		the allocated space in the file, so
+that the file no longer points 		to cluster 0. Then properly update the
+directory entry. 	</li>
+</ul>
+<p>Non-<b>fsck.msdos </b>error messages.</p>
+<ul>
+	<li><b>&lt;folder/file&gt; is not accessible...</b> (while
+		"exploring" the floppy disk with Windows Explorer) 		- you may have
+used lowercase letters in specifying the 		file/directory name. File and
+directory names should always 		be uppercase. If they are lowercase,
+then Windows assumes 		that your directory entry is part of a long file
+name; when 		it finds irregularities, it reports this error. 	</li>
+</ul>
+<p><a href="#Help Index"><font size="1">back to Help Index</font></a></p>
+<hr>
+<p><b>Programming Extras: <a
+ name="Microsoft's White Pages--the good part"><i>Microsoft's White
+Pages--the good part</i></a></b></p>
+<p>Microsoft's Hardware White Pages document: <a
+ href="download/fat_paper.pdf">fat_paper.pdf</a> contains 34 pages of
+everything you ever wanted to know about FAT. If you want some good
+supplementary information, here are some of the best parts:</p>
+<ul>
+	<li>Page 7 -- FAT tables are "little endian"</li>
+	<li>Pages 9-11 -- The boot sector, for FAT-12 (pages  12-13 contain
+the 		equivalent FAT-32 boot sector supplement)</li>
+	<li>Pages  14-15 -- <i>Exactly</i> how to determine the type of FAT
+file 		system. You needn't worry; 3.5" floppy disks are <i>always</i>
+		FAT-12</li>
+	<li>Pages  16-17 -- Extracting the 12-bit value from FAT-12 FAT
+		tables. For a simpler description, see <a
+ href="#Retrieving 12 bit entries from the FAT table">Retrieving
+12 		bit entries from the FAT table</a></li>
+	<li>Pages 22-29 -- Additional information about directory entries</li>
+	<li>Pages 25-29 -- Information relative to implementing long file
+names in 		directory entries</li>
+	<li>Pages 30-31 -- Short and Long filename searching and name
+generation</li>
+	<li>Pages 32-34 -- Notes on the effects of long filenames on older
+systems</li>
+</ul>
+<p><a href="#Help Index"><font size="1">back to Help Index</font></a></p>
+<hr>
+<p><b>Programming Extras: <a name="Sample TA FAT Manager commands"><i>Sample
+TA FAT Manager commands</i></a></b></p>
+<p>The TA FAT Manager is a shell program provided by the TA's. It loads
+your shared object and presents an interface for you. You may use this
+to help debug your shared object. You will enter commands in the
+command text entry area. The TA FAT Manager accepts the following
+standard commands:</p>
+<ol>
+	<li><b><font face="Courier New">dir</font></b> 		(invokes <font
+ face="Courier New">fdListDir</font>). Lists 		the contents of the
+current directory (root directory is 		assumed at startup).<br>
+		(<font face="Courier New"><b>fdDelMem</b></font> invoked
+		automatically on successful completion of 		<font face="Courier New">dir</font>)
+	</li>
+	<li><b><font face="Courier New">cd dirname</font></b> (invokes 		<font
+ face="Courier New">fdChangeDir</font>). Changes to 		the named
+directory (<font face="Courier New">dirname</font> 		includes the dot [.]
+and dotdot [..] directories). 	</li>
+	<li><b><font face="Courier New">del filename</font></b> (invokes 		<font
+ face="Courier New">fdEraseFile</font>). Deletes the 		file <font
+ face="Courier New">filename</font>. 	</li>
+	<li><b><font face="Courier New">rmdir dirname</font></b> (invokes 		<font
+ face="Courier New">fdDelDir</font>). Removes the 		directory <font
+ face="Courier New">dirname</font>. 	</li>
+	<li><b><font face="Courier New">mkdir dirname</font></b> (invokes 		<font
+ face="Courier New">fdMakeDir</font>). Creates the 		directory <font
+ face="Courier New">dirname</font>. 	</li>
+	<li><b><font face="Courier New">copy file1 file2</font></b> 		(invokes <font
+ face="Courier New">fdCopyFile</font>). Copies 		<font
+ face="Courier New">file1</font> to 		<font face="Courier New">file2</font>.
+	</li>
+	<li><b><font face="Courier New">echo string</font></b> 		(handled
+internally). Displays 		<font face="Courier New">string</font>. 	</li>
+</ol>
+<p>The following <i>extended</i> functions are also supported:</p>
+<ol>
+	<li><font face="Courier New"><b>fopen filename mode handle</b></font>
+		(invokes <font face="Courier New">fdOpenFile</font>). Opens 		<font
+ face="Courier New">filename</font> with 		<font face="Courier New">mode</font>,
+and associates it 		with <font face="Courier New">handle</font>. 	</li>
+	<li><font face="Courier New"><b>fclose handle</b></font> (invokes 		<font
+ face="Courier New">fdCloseFile</font>). Close the 		file with index <font
+ face="Courier New">handle</font> in 		the open file table. 	</li>
+	<li><b><font face="Courier New">fread handle size</font></b> (invokes 		<font
+ face="Courier New">fdReadFile</font>). Reads 		<font face="Courier New">size</font>
+bytes of the file with 		<font face="Courier New">handle</font> at the
+current file position. 	</li>
+	<li><b><font face="Courier New">fwrite handle string length</font></b>
+		(invokes <font face="Courier New">fdWriteFile</font>). Writes 		the
+first <font face="Courier New">length</font> bytes of 		<font
+ face="Courier New">string</font> into file associated with 		<font
+ face="Courier New">handle</font> at the current file position. 	</li>
+	<li><b><font face="Courier New">fseek handle pos</font></b> (invokes 		<font
+ face="Courier New">fdSeek</font>). Seeks <font face="Courier New">
+		pos</font> bytes relative to the beginning of the file associated
+		with <font face="Courier New">handle</font>. 	</li>
+</ol>
+<p>You'll notice that these parallel the DOS commands, but are pretty
+stripped down. The TA FAT Manager will report error messages if the
+incorrect number of parameters are given, and will <i>only</i> invoke
+the shared object functions when all the parameters appear to be
+correct. It will also report any pertinent information related to the
+DLL function call (for example, if the function reported success or
+failure). The TA FAT Manager will only allow you to invoke functions
+that it has found in your shared object--these functions are listed when
+the shared object is loaded.</p>
+<p>For you true to the faith UNIX fans out there, the TA FAT Manager
+also supports the UNIX equivalent commands:</p>
+<ol>
+	<li><b><font face="Courier New">dir&nbsp;&nbsp;&nbsp; -&gt; ls</font></b></li>
+	<li><b><font face="Courier New">del&nbsp;&nbsp;&nbsp; -&gt; rm</font></b></li>
+	<li><b><font face="Courier New">copy&nbsp;&nbsp; -&gt; cp</font></b></li>
+</ol>
+<p>The TA FAT Manager also performs other translations for you.</p>
+<ul>
+	<li>The TA FAT Manager's command line tokenizer allows for
+		double-quoted strings as arguments to fwrite. (This is 		the only way
+to send data that includes spaces into the 		FWRITE command.) The
+double-quotes are removed from the 		token, and the text contained
+therein is included as a 		single token. 	</li>
+	<li>Any tokens following the keyword <b>ECHO</b> are ignored 		and
+passed directly to output. This means that <i>anything</i> 		following
+the command <b>ECHO</b> is acceptable, including 		spaces. 	</li>
+</ul>
+<p><a href="#Help Index"><font size="1">back to Help Index</font></a></p>
+<hr>
+<p align="center"><font size="1">Contributors: Travis Leithead and Mark
+Richards, Spring 2002<br>
+Second draft: August 20, 2002<br>
+Linux draft: February 2003 Jeremy Wendt</font></p>
+</body>
+</html>

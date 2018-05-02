@@ -1,0 +1,82 @@
+All fantasy creatures MUD?
+Dream is name of OS
+Werewolves change at full moon, can't at new moon, and can't wear EQ as a wolf, though it is naturally stronger
+lockers to rent, autopay, 10-20 item storage, weight does not matter
+down is bank + lockers, north of that is post office
+polyforms use 'stance' to change to creatures, some eq is wearable...
+some eq wears out???
+dragon tail spike
+uni tail ribbons?
+Recall mob: _old_ dragon (black)     *looks around deciding who to eat*
+money is pracs, exp is levels
+different breath weapons?
+unicorns have seperate spell set
+black unicorns pkok?  More aggro
+5+ spell packs for unis?
+start with 1-3(?) classes, more cost money
+clark bar is rare item, adds stats?
+channel usage shows externally
+TP is gossip channel
+spell to take you to a room you have visited, lock when there, visit later?  *your surroundings fade away...*
+terminate after x deaths in an hour???
+ENCOURAGE SPELLS
+show damage
+recharge time between spells? -go down as get better
+have good help files on all spells and skills
+blindness-drops %hit rate?
+plate scales and horn at smithy
+smaller races less str more dex
+donations area only own lvl stuff around? -special list command?
+need sack to carry anything??? -increase inv size over time?
+dragon only on list at specific time?
+dex + hroll???
+str + droll???
+etherial main city
+whisper shows whole words...
+more exp for longer killing?
+level xp reset if die?
+driud library-hidden room with rare skill and spell books
+QP for entering hidden room.  New chat channel too
+Unicorn coat White-Bronze-Silver-Gold-Platinum
+Dragon scale pattern upgarde, type upgrade, claws upgrade
+Newbie school is a dream, wake up is when you leave, keeping eq.  hmm...
+Also, transported in, unconsious, remember stuff later?
+Rare repop in donations?
+have pockets in stuff, ect.  jacket.pocket ?
+Can equip a secondary
+trail - follow one room back
+follow - same
+long range Would need to have knowlege of surrounding rooms:
+full combat msgs
+group same as Shades
+option to turn on/off missed msgs
+arrow(number) equip to quiver
+attack pulls from quiver, shoot <arrow> <target> specify arrow
+item building workshops off of /
+arrow quality makes a diff
+feathers, shaft(straightness, self, accuracy), type of head(damage)
+lore skill
+police wimpy but w/slay swords
+think about blocking/parrying (1/20)
+being low on mana, makes secondary effects
+blood loss is hp loss/tick like shades
+skill max based on lvl?
+arrow 5% chance of hitting thing in room (max distance based on str), +based on skill
+doors seperatly visible?
+walkin/out
+cname - color name
+tail - Last name
+title seperate title
+learning? - unskilled slower learn rate, get skilled gives you a min, faster curve?
+combat skills effective based on relative level?  Done with %, etc.  How then less powerful on higher level mobs?
+use the x*<item> syntax in commands?
+gold unis as well?  Class by color?
+an echo command
+Able to set a clock offset
+Have some global "What are you talking about?" message, so only have to change once.
+For skills, can keep roughly same lvl in str, but can upgrade the skill (to bash2, or something)
+Channels: global, area (new one - kinda, is yell), group, room, etc?
+
+No levels - level up based on skill / class usage
+Fighting is glorified bounty hunting - get paid by central autority per mob per type, etc
+Crafting classes are then equal to fighting, both have equally pointless jobs

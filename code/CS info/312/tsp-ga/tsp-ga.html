@@ -1,0 +1,122 @@
+<h1>TSP Genetic Algorithm</h1> 
+
+<p>Solve the TSP problem using a genetic algorithm.  We'll discuss the
+genetic algorithm algorithm in class.  Several helpful handouts are
+included in the docs directory of the project description to supplement class material and give you ideas for performance improvements:</p>
+<ul>
+  <li><font color="green">genetic-algorithms.pdf</font>: This is a
+  basic overview of genetic algorithms and their structure. It has a
+  nice genetic algorithm <font color="red">general template</font>
+  with a good description of <font color="red">three different
+  selection strategies</font>.</li>
+  <li><font color="green">genetic-algorithms-overview.pdf</font>: This
+  is another basic overview of genetic algorithms and their structure.
+  It too has a <font color="red">nice template</font> as well as some
+  <font color="red">typical values for initial populations, crossover
+  probabilities, and mutation probabilities.</font></li>
+  <li><font color="green">edge-recombination-crossover.pdf</font>: defines the ERX crossover algorithm.</li>
+  <li><font color="green">greedy-crossover.txt</font>: contains a
+  pointer to a web page that includes a nice definition of the basic
+  <font color="red">greedy crossover algorithm</font> from
+  J. Grefenstette. This is a good starting point for crossover
+  algorithms.  The page also contains various other methods for
+  selection and crossover that may help performance.</li>
+  <li> <font color="green">mutation-greedy-swap.pdf</font>: describes
+  a greedy mutation algorithm.</li>
+  <li> <font color="green">premature-convergence.ps</font>: premature
+  convergence can be a real issue because your genetic algorithm gets
+  stuck in a local minimum.  This paper describes things you can do to
+  <font color="red">avoid local minimum</font> by keeping diversity in
+  your population.</li>
+</ul>
+<p>The
+implementation of this algorithm will require more than an afternoon,
+and there are several different implementation choices and parameters
+that you can modify to adjust performance.  </p>
+
+<h2>Input</h2> 
+
+You will read input from a file.  The first line of the file will
+contain two integers.  The first, n, gives the number of cities in the
+problem.  The second gives the time bound for that problem.  The cost
+matrix is given in the next n lines.  Each line contains n numbers per
+line.  Cities are named using letters of the alphabet starting with
+"a" through "z" then using "A" through "Z".  (So the first line of the
+input file contains the distance from city a to every other city).  A
+few examples, with solutions, are given in the project distribution.
+  The graphs will always be <font color="green">fully connected</font>
+  with <font color="green">positive edge weights.</font>
+
+<h2>Implementation</h2> 
+
+You will implement a genetic algorithm to try and solve the tsp
+problem within the given time bound.  If time expires before your
+algorithm converges to a solution, then you should return the best solution
+you've found so far and exit <font color="green">(i.e., the fittest member of the current generation)</font>.  You do not need to invent your own
+algorithm.  The algorithms discussed in class and the notes will work
+  just fine, but you are free to explore ideas to improve performance.
+  We suggest you <font color="red">implement a basic algorithm
+  first</font> and then begin to optimize according to your results.
+
+<h2>Output</h2> 
+
+If you converge to an optimal solution, output the following:
+<font color="green">
+<pre> 
+File: a.txt
+Time: 3.21 
+EXACT
+Distance: 20
+Tour: abdec
+</pre>
+</font>
+Where Time is the number of seconds you used.  Note that the tour
+output always starts with city a.  <p>
+
+If you do not converge to an optimal solution, then output the following:
+<font color="green">
+<pre> 
+File: a.txt 
+Time 2.1 
+NOT Exact
+Distance: 32
+Tour adbec
+</pre> 
+</font>
+<h2> Grading </h2> 
+
+Absolute performance requirements are given in each input file.
+You'll be graded on how well you algorithm performs an a set of
+benchmark problems.  Some problems will be designed to be completable
+by a "reasonable" implementation, other will be designed to too hard
+for a "reasonable" implementation to complete within the time bound.
+For the second class of problems, you'll be graded on how close your
+solution is to the optimal solution.  For each such problem, we'll
+decide that an answer within x% of optimal gets full credit.<p> 
+
+Relative performance will be measured on time required to converge to a
+solution and closeness to an optimal solution. 
+
+<h2> Code </h2> 
+
+The project file distribution includes a timing function in <font color="red">tsp-ga.cc</font>
+that you should use to measure time in your code.  Remember that you
+need to print a the current best solution and exit when time expires.  Write
+your code in <font color="red">tsp-ga.cc</font>
+
+<h2> Burning Question </h2> 
+
+<ol>
+<li>Compare and contrast your genetic algorithm to solve tsp to your branch and bound algorithm in terms of efficiency in both time and space?</li>
+<li>Which algorithm will scale to larger graphs?</li>
+</ol>
+
+<h2> Handin </h2> 
+
+Handin, as usual, is done using a Makefile.  Write your code in
+<font color="red">tsp-ga.cc</font> and be sure your project compiles with the standard Makefile
+included in the project.  <p> 
+
+Mail your burning answer to your professor, either
+<A HREF="mailto:jones@cs.byu.edu"><I>jones@cs.byu.edu</I></A> or
+<A HREF="mailto:egm@cs.byu.edu"><I>egm@cs.byu.edu</I></A>

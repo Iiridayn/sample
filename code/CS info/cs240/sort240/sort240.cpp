@@ -1,0 +1,212 @@
+#include <iostream>
+#include <fstream>
+#include <ctype.h>
+#include <stdlib.h>
+#include <string.h>
+using namespace::std;
+
+int init(istream &infile, int field);
+char** makeline(istream &infile, int &cols);
+int sort(const void* a, const void* b);
+
+bool I = false, R = false, N = false;
+int Cols = 0, Field = 0;
+
+int usage(){cerr << "sort240 [options] field [file]" << endl; return 1;}
+int badfile(){cerr << "Error opening file!" << endl; return 2;}
+void getVars(const char *vars) {
+  int max = strlen(vars);
+  for(int i = 1; i < max; i++) {
+    switch(vars[i]) {
+      case 'i':
+      case 'I':
+	I = true;
+	break;
+      case 'r':
+      case 'R':
+	R = true;
+        break;
+      case 'n':
+      case 'N':
+	N = true;
+	break;
+    } //ignore any not looking for
+  }
+}
+
+int main(int argc, char* argv[]) {
+  if(argc > 1) {
+    if(argc == 2) {
+      return init(cin, atoi(argv[1]));
+    }
+    else {
+      if(argc == 3) { // vars or filename
+	if(argv[1][0] == '-') { //vars
+	  getVars(argv[1]);
+	  return init(cin, atoi(argv[2]));
+	}
+	else { //filename
+	  ifstream infile(argv[2]);
+	  if(infile)
+	    return init(infile, atoi(argv[1]));
+	  else	
+	    return badfile();
+        }
+      } // 3
+      else {
+	if(argc > 4)
+	  return usage();
+	else { //argv == 4
+	  getVars(argv[1]);
+	  ifstream infile(argv[3]);
+	  if(infile)
+	    return init(infile, atoi(argv[2]));
+	  else
+	    return badfile();
+	}
+      } 
+    }
+  }
+  else
+    return usage();
+}
+
+void test(char*** array, int lines, int cols) {
+  //cout << "test" << endl;
+  for(int i = 0; i < lines; i++) {
+    for(int j = 0; j < cols; j++) {
+      int chars = strlen(array[i][j]);
+      int k;
+      for(k = 0; k < chars; k++)
+	cout << array[i][j][k];
+      if((k < 8)&&!isdigit(array[i][j][0]))
+	 cout << '\t';
+      cout << '\t';
+    }
+    cout << endl;
+  }
+}
+
+int init(istream &infile, int field) {
+  //cout << "init" << endl;
+  Field = field;
+  int cols = -1;
+  int lines = -1;
+  char ***all = new char**;
+  while(!infile.eof()) {
+    char** line = makeline(infile, cols);
+    if(line == 0) {
+      cerr << "Error: Line " << (lines+2) << " does not have a " << (cols+1)
+	   << (((cols+1)==1)?"st":((cols+1)==2)?"nd":((cols+1)==3)?"rd":"th")  
+	   << " column" << endl;
+      return 3;
+    }
+    lines++;
+    char ***temp = new char**[lines+1];
+    for(int i = 0; i < lines; i++) {
+      temp[i] = all[i];
+    }
+    all = temp;
+    all[lines] = line;
+  }
+  cols++;
+  lines++;
+  Cols = cols; //global
+  if(field > cols || field < 1) {
+    cerr << "Error: There is no column " << field << endl;
+    return 4;
+  }
+  else if(N) {
+    if(!isdigit(all[0][field-1][0])) {
+      cerr << "Error: Column " << field << " is non numeric" << endl;
+      return 5;
+    }
+  }
+  qsort(all, lines, sizeof(all), sort);
+  test(all, lines, cols);
+  return 0;
+}
+
+char* makefield(istream &infile, bool &final) {
+  //cout << "makefield" << endl;
+  char* output = new char;
+  int len = -1;
+  bool end = false;
+  while(!infile.eof() && !end) {
+    char chr = infile.get();
+    //if(I) tolower(chr);
+    if(!isspace(chr) && chr != EOF) {
+      len++;
+      char* temp = new char[len+1];
+      for(int i = 0; i < len; i++) {
+	temp[i] = output[i];
+      }
+      temp[len] = chr;
+      output = temp;
+    }
+    else {
+      if(chr == '\n') final = true;
+      while(isspace(infile.peek()))
+	infile.get();
+      if(infile.peek() == EOF) infile.get();
+      end = true;
+    }
+  }
+  //cout << output << endl;
+  return output;
+}
+
+char** makeline(istream &infile, int &cols) {
+  //cout << "makeline" << endl;
+  char** output = new char*;
+  int col = -1;
+  bool end = false;
+  while(!infile.eof() && !end) {
+    col++;
+    char* field = makefield(infile, end);
+    char** temp = new char*[col+1];
+    for(int i = 0; i < col; i++) {
+      temp[i] = output[i];
+    }
+    temp[col] = field;
+    output = temp;
+  }
+  //for(int i = 0; i < col+1; i++)
+  //  cout << output[i] << '\t';
+  //cout << endl;
+  if(cols == -1) cols = col;
+  if(col == cols) return output;
+  else return 0;
+}
+
+int stringcomp(char* a, char* b) {
+  int l1 = strlen(a);
+  int l2 = strlen(b);
+  int length = (l1 > l2)?l2:l1;
+  for(int i = 0; i < length; i++) {
+    char c1 = (I)?tolower(a[i]):a[i];
+    char c2 = (I)?tolower(b[i]):b[i];
+    if(c1 > c2) return (R)?-1:1;
+    else if(c1 < c2) return (R)?1:-1;
+  }
+  if(l1 < l2) return (R)?1:-1;
+  else if(l1 > l2) return (R)?-1:1;
+  else return 0;
+}
+
+int sort(const void* a, const void* b) {
+  char** x = *(char***)a;
+  char** y = *(char***)b;
+  
+  char* s1 = x[Field-1];
+  char* s2 = y[Field-1];
+  
+  if(N) {
+    int i1 = atoi(s1);
+    int i2 = atoi(s2);
+    if(i1 > i2) return (R)?-1:1;
+    else if(i1 < i2) return (R)?1:-1;
+    else return 0;
+  }
+  else return stringcomp(s1, s2);
+}

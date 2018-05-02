@@ -1,0 +1,31 @@
+upgrade the 'know' command as levels up (lore involved?)
+
+slight favor towards skills, slightly more for spells (cure needs to be factored!)
+NPC AI is 1/10th skill attacks?  1/20th?  1/50th? - how ofter want players to?
+
+gambling halls good way to waste player money for some; also teach life lesson (not main city or hidden)
+
+food could also be autoeaten, but it is a constant drain on income (note: CONSTANT as well)
+
+newbs have no daily living costs (sheltered state dorms, eg.)
+
+allow slight gold hoarding, but millionares should be _discouraged_
+
+alternate ways of exp, but what?
+
+an area of rares that can only be teleported to... (in library)
+
+100 levels - straight curve
+
+library _is_ help files
+
+login to a shell account, with room implemented there!
+
+use four graduated realms past for mud -?
+
+char out of home is autologged in, not can select alt char
+
+l in corpse gives "the only items _worth picking up_..."; excuse for no eq, but tough mobs
+
+can enchant eq with certain spells, costs 10x normal, to make permanant, need a fixer gem, rarer && more expensive the higher lvl spell you go.  limit number of max gems per weapon by weapon num thing.
+

@@ -1,0 +1,147 @@
+Test #1
+./sort240 -n 1 ~cs240ta/win2003/sort/case2.txt
+
+99	flintstone3	DINO	21	1
+0210	MOUSE2		Minnie	90	6
+652	DUCK		donald	50	2
+1314	RUBBLE		Betty	78	3
+3789	FLINTSTONE2	Pebbles	78	7
+4952	flintstone4	FRED	38	8
+5785	rubble1		barney	87	9
+7114	mouse		Mickey	95	5
+8321	FLINTSTONE1	WILMA	99	4
+11111	RUBBLE2		BAMBAM	7	10
+
+**********************************************************
+Test #2
+./sort240 -nr 1 < ~cs240ta/win2003/sort/case2.txt
+
+11111	RUBBLE2		BAMBAM	7  10
+8321	FLINTSTONE1	WILMA	99 4
+7114	mouse		Mickey	95 5
+5785	rubble1		barney	87 9
+4952	flintstone4	FRED	38 8
+3789	FLINTSTONE2	Pebbles	78 7
+1314	RUBBLE		Betty	78 3
+652	DUCK		donald	50 2
+0210	MOUSE2		Minnie	90 6
+99	flintstone3	DINO	21 1
+
+
+**********************************************************
+Test #3
+./sort240 2 < ~cs240ta/win2003/sort/case2.txt
+
+652	DUCK		donald	50 2
+8321	FLINTSTONE1	WILMA	99 4
+3789	FLINTSTONE2	Pebbles	78 7
+0210	MOUSE2		Minnie	90 6
+1314	RUBBLE		Betty	78 3
+11111	RUBBLE2		BAMBAM	7  10
+99	flintstone3	DINO	21 1
+4952	flintstone4	FRED	38 8
+7114	mouse		Mickey	95 5
+5785	rubble1		barney	87 9
+
+
+**********************************************************
+Test #4
+./sort240 -ir 2 ~cs240ta/win2003/sort/case2.txt
+
+11111	RUBBLE2		BAMBAM	7  10
+5785	rubble1		barney	87 9
+1314	RUBBLE		Betty	78 3
+0210	MOUSE2		Minnie	90 6
+7114	mouse		Mickey	95 5
+4952	flintstone4	FRED	38 8
+99	flintstone3	DINO	21 1
+3789	FLINTSTONE2	Pebbles	78 7
+8321	FLINTSTONE1	WILMA	99 4
+652	DUCK		donald	50 2
+
+
+**********************************************************
+Test #5
+./sort240 -n 4 < ~cs240ta/win2003/sort/case2.txt
+
+11111	RUBBLE2		BAMBAM	7  10
+99	flintstone3	DINO	21 1
+4952	flintstone4	FRED	38 8
+652	DUCK		donald	50 2
+1314	RUBBLE		Betty	78 3
+3789	FLINTSTONE2	Pebbles	78 7
+5785	rubble1		barney	87 9
+0210	MOUSE2		Minnie	90 6
+7114	mouse		Mickey	95 5
+8321	FLINTSTONE1	WILMA	99 4
+
+
+
+
+
+**********************************************************
+Test #6
+./sort240 -ri 1 ~cs240ta/win2003/sort/case2.txt
+
+99	flintstone3	DINO	21 1
+8321	FLINTSTONE1	WILMA	99 4
+7114	mouse		Mickey	95 5
+652	DUCK		donald	50 2
+5785	rubble1		barney	87 9
+4952	flintstone4	FRED	38 8
+3789	FLINTSTONE2	Pebbles	78 7
+1314	RUBBLE		Betty	78 3
+11111	RUBBLE2		BAMBAM	7  10
+0210	MOUSE2		Minnie	90 6
+
+
+**********************************************************
+Test #7
+./sort240 -i 3 < ~cs240ta/win2003/sort/case2.txt
+
+11111	RUBBLE2		BAMBAM	7  10
+5785	rubble1		barney	87 9
+1314	RUBBLE		Betty	78 3
+99	flintstone3	DINO	21 1
+652	DUCK		donald	50 2
+4952	flintstone4	FRED	38 8
+7114	mouse		Mickey	95 5
+0210	MOUSE2		Minnie	90 6
+3789	FLINTSTONE2	Pebbles	78 7
+8321	FLINTSTONE1	WILMA	99 4
+
+**********************************************************
+Test #8
+./sort240 -r 6 ~cs240ta/win2003/sort/case2.txt
+
+Error: There is no column 6.
+
+
+**********************************************************
+Test #9
+./sort240 -rn 3 < ~cs240ta/win2003/sort/case2.txt
+
+Error: Column 3 is non numeric
+
+**********************************************************
+Test #10
+./sort240 5 case3.txt
+
+Error: Line 4 Does not have a 5th column
+
+**********************************************************
+Test #11
+./sort240 -n 5 ~cs240ta/win2003/sort/case2.txt
+
+99	flintstone3	DINO	21 1
+652	DUCK		donald	50 2
+1314	RUBBLE		Betty	78 3
+8321	FLINTSTONE1	WILMA	99 4
+7114	mouse		Mickey	95 5
+0210	MOUSE2		Minnie	90 6
+3789	FLINTSTONE2	Pebbles	78 7
+4952	flintstone4	FRED	38 8
+5785	rubble1		barney	87 9
+11111	RUBBLE2		BAMBAM	7  10
+
+

@@ -1,0 +1,35 @@
+3 types of mana:
+lvl max
+cur max
+cur
+
++1% to cur max (< lvl max (random added to at lvl up)) at xp gain?
+Can drop cur max using some spells, overeaching self
+
+mana recharge at % rate?
+
+all stats, lvl, recharge, @ %?
+
+but give real values!
+
+problem: lvl difference is BIG
+pk !worky
+problem SLOW to start
+
+ideas: logarithmic?
+opposite.
+FAST start, later lvl diff SMALL
+
+ideas: linear?
+EVEN rate, lvl diff TINY
+
+want high lvl diff > low lvl diff
++func(lvl)? (n!(but for +, not *))? - Factorial progression
+
+meditate upon this truth
+
+
+Skill name I, skill name II, skill name III, for diff strength, diff lvl - skill upgrade
+
+skill str based % effect changes by skill level (of skill, and of player)
+net: skill works throughout

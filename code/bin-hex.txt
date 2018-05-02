@@ -1,0 +1,3 @@
+hex<->bin converter:
+
+Use command line args, simple operations, clear comments, multi input?

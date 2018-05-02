@@ -1,0 +1,10 @@
+00?/,x\
+/xP\? /
+\ ?/P!
+
+Okay, this is a fungeoid language they call SuperHack, and is difficult to
+comment. We add a 0 to the stack, and use another to enter the first loop
+ - where we read input until we reach a 0 (duplicating it on the stack to
+test it). We then Print each ascii character off the stack, duplicating each
+ again before testing, and finish up with the last null terminator (the
+sentinal from the setup).

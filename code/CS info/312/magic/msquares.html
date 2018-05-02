@@ -1,0 +1,151 @@
+<h1> Magic Squares</h1> 
+
+Implement a backtracking algorithm to solve the magic squares problem.
+You will need to invent a function that decides when to backtrack. 
+
+<h2> Problem </h2> 
+
+Given a set of n^2  numbers and two vectors of n
+numbers arrange the n^2 numbers into an n by n table such that the sum
+of each row and the sum of each column match the corresponding value
+in the vectors.  <p>
+
+For example, if you are given the numbers 
+<pre>
+1 3 5 1 13 2 2 3 8 
+</pre> 
+and the vectors
+<pre>
+13 16 9 and 10 19 9 
+</pre> 
+then one possible solution is: 
+<pre> 
+8  3  2  = 13
+1  13 2  = 16 
+1  3  5  = 9 
+=  =  = 
+10 19 9 
+</pre> 
+
+For more examples, see any of a number of magic square solvers available online. 
+
+<h2>Input</h2> 
+
+You'll be given a file containing a magic squares problem of size 1,2
+or 3.  The file format is:
+<ol>
+<li> Problem size as a single integer on the first line
+<li> A single candidate per line on the next n*n lines. 
+<li> A row target, one per line, for the next n lines, and 
+<li> A column target, one per line, for the remaining n lines. 
+</ol>
+Several examples are given below.  Each number will be smaller than
+9999--including row and column values. 
+
+<h2>Output</h2> Output a solution to the magic squares problem and the
+number of assignments of values to the magic square you made before
+finding a solution.  (see <a href="http://vv.cs.byu.edu/cs312/">the
+blog</a> for more details) The output format is:
+
+<pre> 
+[jones@phirewall magic-square]$ msquare easy.txt
+4       3       7
+2       1       3
+6       4
+22
+</pre> 
+in which 22 is the number of assignments made before
+finding a solution.
+
+If no solution is possible, output the number of assignments you
+made without finding a solution.  For example, 
+<pre>
+[jones@phirewall magic-square]$ msquare unsolvable.txt
+362880
+</pre> 
+in which 362880 is the number of assignments made although a solution was not found. 
+
+
+If no solution is possible, then your program might generate upto
+(n^2)! (that's n squared factorial) complete squares and make far more
+assignments.  Your backtracking algorithm should make much fewer.
+
+<h2>Burning Question</h2> 
+
+Given a partially filled-in magic square, how do you determine if it
+will lead to a solution or not?  Will your method for pruning the
+search work if we allow negative numbers?
+
+<h2>What to turn in</h2> 
+
+As usual, mail your burning answer to your instructor
+(jones@cs.byu.edu or egm@cs.byu.edu) and run Make handin to submit
+your project.  The Makefile will only submit your msquare.cc file.  If
+you use multiple files, you'll need to modify the makefile. 
+
+<h2>Grading</h2> 
+
+For full credit, your program should correctly any magic 3x3 magic
+square problem in under 1 minute.  We will be grading based on the number
+of assignments made.  For full credit, you should never make the complete amount of assignments. 
+
+<h2> Sample Files</h2> 
+
+<ul>
+<li> <a href="easy.txt">n=2</a> has a solution.
+<li> <a href="hard.txt">n=3</a> has a solution. 
+<li> <a href="unsolvable.txt">n=3</a> does not have a solution
+</ul>
+
+<h2> Helpful Hints</h2> 
+
+There are probably smarter and easier ways to solve this problem, but
+the following ideas are pretty smart and easy.
+
+<ul> 
+
+<li> Start with an empty matrix and fill it in cell by cell.  A
+significant challenge is determining which candidate to put in the
+next cell.  You've got to implement something that allows any and each
+of the candidates to be in the next cell.  I did this with a for-loop
+on n and a function that returns the ith unused candidate for a given
+value of i.  To do that, I had to devise a way to mark a candidate as
+"used" then loop through the unused candidates.  This list of unused
+candiadates was then propogated to each recursive call.
+
+<li> You can implement depth first search either recursively or using
+a stack.  If you implement it recursively, remember that C only allows
+arrays to be passed by reference.  That means that a pointer to the
+same array is passed to every recursive call (which means the child
+actualy modifies the parent's version of the array).  That means that
+you can either unmodify the array before returning from a recursive
+call or you can allocate a new array in each recursive call. Either
+method will work for this project.  You've got to think this through
+for every parameter and local variable in your recursive function.
+Its not hard, if you are careful about what's going on in C.
+
+<li> If you implement your DFS using a stack, be sure you have
+everything you need in your stack frame structure (the stack frame
+structure is the datastructure that you'll push onto the stack).
+You'll need enough information to figure out which child to generate
+next.  This includes knowing: which cell to fill in next, which
+candidate to use next, which candidates have been used in the current
+matrix and which candidates have been used for the next cell.  You'll
+need all the same information for the recursive implementation, but
+some of the information gets stored as local variables in the stack of
+recursive function calls.  If you don't have enough information to
+figure out whether or not all of the children have been generated,
+then you don't have enough information.
+
+<li> When you've got a completely full matrix, call a function that
+checks a matrix to see if the matrix is a solution.  This function
+basically just adds the rows and columns to see if they sum to the
+correct values.  This used to be the way to count for performance, but
+we are now counting the number of assignments made rather than the
+number of complete arrays generated.
+
+<li> There are lots of ways to do the search more efficiently than
+what I've described above.  Feel free to implement these if you like.
+</ul>
+
+

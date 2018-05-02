@@ -1,0 +1,55 @@
+#!/bin/sh
+echo " *********************PROGRAM STARTS HERE*********************************************************
+echo "**********Test #1************************************"
+echo "./sort240 -n 1 ~cs240ta/win2003/sort/case2.txt"
+./sort240 -n 1 ~cs240ta/win2003/sort/case2.txt
+
+
+echo "**********Test #2************************************"
+echo "./sort240 -nr 1 < ~cs240ta/win2003/sort/case2.txt"
+./sort240 -nr 1 < ~cs240ta/win2003/sort/case2.txt
+
+
+echo "**********Test #3****************sorttest************"
+echo "./sort240 2 < ~cs240ta/win2003/sort/case2.txt"
+./sort240 2 < ~cs240ta/win2003/sort/case2.txt
+
+
+echo "**********Test #4************************************"
+echo "./sort240 -ir 2 ~cs240ta/win2003/sort/case2.txt"
+./sort240 -ir 2 ~cs240ta/win2003/sort/case2.txt
+
+
+echo "**********Test #5************************************"
+echo "./sort240 -n 4 < ~cs240ta/win2003/sort/case2.txt"
+./sort240 -n 4 < ~cs240ta/win2003/sort/case2.txt
+
+
+echo "**********Test #6************************************"
+echo "./sort240 -ri 1 ~cs240ta/win2003/sort/case2.txt"
+./sort240 -ri 1 ~cs240ta/win2003/sort/case2.txt
+
+
+echo "**********Test #7************************************"
+echo "./sort240 -i 3 < ~cs240ta/win2003/sort/case2.txt"
+./sort240 -i 3 < ~cs240ta/win2003/sort/case2.txt
+
+
+echo "**********Test #8************************************"
+echo "./sort240 -r 6 ~cs240ta/win2003/sort/case2.txt"
+./sort240 -r 6 ~cs240ta/win2003/sort/case2.txt
+
+
+echo "**********Test #9************************************"
+echo "./sort240 -rn 3 < ~cs240ta/win2003/sort/case2.txt"
+./sort240 -rn 3 < ~cs240ta/win2003/sort/case2.txt
+
+
+echo "**********Test #10***********************************"
+echo "./sort240 5 ~cs240ta/win2003/sort/case3.txt"
+./sort240 5 ~cs240ta/win2003/sort/case3.txt
+
+
+echo "**********Test #11************************************"
+echo "./sort240 -n 5 ~cs240ta/win2003/sort/case2.txt"
+./sort240 -n 5 ~cs240ta/win2003/sort/case2.txt

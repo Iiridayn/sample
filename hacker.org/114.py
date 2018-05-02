@@ -1,9 +1,9 @@
-a,b = 1,1
-for i in range(3,1500001):
-	a,b = b,a+b
+import sys
+sys.path.append("../projecteuler")
+from euler import fib
 
+f = str(fib(int(sys.argv[1])))
 ans = ""
-s = str(b)
-for i in range(0, len(s), 20000):
-	ans += s[i]
+for i in range(0, len(f), 20000):
+	ans += f[i]
 print(ans)

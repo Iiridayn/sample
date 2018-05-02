@@ -1,0 +1,8 @@
+File: small.txt
+Limit: 10.000000 sec
+Time: 0.000000 sec
+OPTIMAL
+Distance: 8
+Tour: ACBEDA
+
+cycles = 5

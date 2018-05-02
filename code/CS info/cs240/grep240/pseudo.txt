@@ -1,0 +1,37 @@
+\\
+\*
+
+for(each char in the line) {
+if(end of pattern, line worky)
+if(PATTERN = evil one...  *) {
+  if have star, error
+  else {
+    have star = true;
+    if is no more in pattern
+      line worky
+    else {
+      while(current != next pattern) {
+        next current;
+      }
+      if(end of line, but not pattern) line ! worky
+      //if(end of pattern) line worky
+      if neither end - continue
+    }
+  }
+}
+else if(current pattern loc = \)
+{
+  if(next != *,\)
+    error
+  else
+    check for next, if not ==, dec this, if ==, inc pattern
+}
+else if(equal)
+inc pattern loc
+else
+set pattern loc = 0
+redo loop
+}
+
+pattern: abc
+aabc
