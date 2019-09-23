@@ -9,6 +9,7 @@
 
 #define BLOCK_LEN 128 // should never change from 128; analysis of other values is much weaker
 #define AES_Nb (BLOCK_LEN / 32) // compiler should optimize this
+#define MAX_KEY_WORDS 8
 
 #define FFADD(x, y) (x) ^ (y)
 
@@ -125,15 +126,15 @@ static word_t rot_word(word_t word)
 	return word;
 }
 
-#define DEMO_BYTES(STATE) do { \
-	for (int i = 0; i < (AES_Nb * sizeof (uint32_t)); i++) \
+#define DEMO_BYTES(STATE, BYTES) do { \
+	for (int i = 0; i < BYTES; i++) \
 		printf("%02x", (STATE)[i]); \
 	printf("\n"); \
 } while (0);
 #define DEMO(ROUND, LABEL, STATE) do { \
 	if (!demo_mode) break; \
 	printf("round[%2d].%-10s", ROUND, LABEL); \
-	DEMO_BYTES(STATE); \
+	DEMO_BYTES(STATE, (AES_Nb * sizeof (word_t))); \
 } while (0);
 
 #define DUMP_WORD(W) printf("%02x%02x%02x%02x ", (W).byte[0], (W).byte[1], (W).byte[2], (W).byte[3]);
@@ -510,29 +511,50 @@ static void test()
 	ASSERT(memcmp(state, b_in, sizeof (state)) == 0);
 }
 
+static void print_key_state(uint8_t *key, uint8_t key_bytes, uint8_t *state)
+{
+	printf("PLAINTEXT:          ");
+	DEMO_BYTES(state, (AES_Nb * sizeof (word_t)));
+	printf("KEY:                ");
+	DEMO_BYTES(key, key_bytes);
+}
+
 static void demo()
 {
 	demo_mode = true;
 
-	uint8_t key[16] = {
+	uint8_t key[32] = {
 		0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
 		0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+		0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
+		0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
 	};
 	uint8_t state[16] = {
 		0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
 		0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff,
 	};
-	int nr = (sizeof (key) / sizeof (word_t)) + 6;
+
+	uint8_t nr;
 	word_t w[sizeof (key) * (1 + (sizeof (key) / sizeof (word_t)))] = {0};
-	expand_key(key, sizeof (key), w, nr);
 
-	printf("PLAINTEXT:          ");
-	DEMO_BYTES(state);
-	printf("KEY:                ");
-	DEMO_BYTES(key);
-
+	nr = 10;
+	expand_key(key, 16, w, nr);
+	print_key_state(key, 16, state);
 	cipher(state, w, nr);
+	decipher(state, w, nr);
+	printf("\n\n");
 
+	nr = 12;
+	expand_key(key, 24, w, nr);
+	print_key_state(key, 24, state);
+	cipher(state, w, nr);
+	decipher(state, w, nr);
+	printf("\n\n");
+
+	nr = 14;
+	expand_key(key, sizeof (key), w, nr);
+	print_key_state(key, sizeof (key), state);
+	cipher(state, w, nr);
 	decipher(state, w, nr);
 
 	demo_mode = false;
@@ -598,8 +620,8 @@ int main(int argc, char *argv[])
 
 	uint8_t nr = key_bytes / sizeof (word_t) + 6; // = words in key + 6; might not generalize outside of 4/6/8
 
-	// max size is 4 * 8 * (1 + 8)
-	word_t round_keys[4 * 8 * (1 + 8)] = {0};
+	// max size buffer; can always use less
+	word_t round_keys[AES_Nb * MAX_KEY_WORDS * (1 + MAX_KEY_WORDS)] = {0};
 	expand_key(key, key_bytes, round_keys, nr);
 
 	uint8_t state[AES_Nb * sizeof (word_t)] = {0}; // I give up - column major it is
@@ -611,12 +633,8 @@ int main(int argc, char *argv[])
 	}
 	// TODO: check if input is too long; fail if is
 
-
 	if (demo_mode) {
-		printf("PLAINTEXT:          ");
-		DEMO_BYTES(state);
-		printf("KEY:                ");
-		DEMO_BYTES(key);
+		print_key_state(key, key_bytes, state);
 	}
 
 	if (reverse)
