@@ -101,3 +101,5 @@ that the true average number of hashes is not precisely 2^(n/2), but rather
 closer to 2^(n / 1.9214) (or 2^(n * 0.5205)).
 
 I don't much like the sample sizes required to reach the theoretical value.
+
+Wikipedia gives (https://en.wikipedia.org/wiki/Birthday_attack#Mathematics) a tighter bound for collision attacks: `sqrt((pi / 2) * 2^n)`. For 16 bits, this computes the value ‭320.85 - extremely close to the experimental result.
