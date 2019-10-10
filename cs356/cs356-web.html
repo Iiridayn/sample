@@ -1,0 +1,588 @@
+<!doctype html>
+<html>
+	<head>
+		<title>CS 356 Special Collections Project Final</title>
+<style>
+body {
+	background-image: url("bg w thumbnail.jpg");
+	width: 1440px;
+	height: 1167px;
+	margin: 0;
+	position: relative;
+	font-family: "Lucida Grande", Helvetica, Arial, sans-serif
+}
+
+#flash {
+	position: absolute;
+	top: -82px;
+	right: 54px;
+	pointer-events: none;
+	display: none;
+}
+
+button {
+	cursor: pointer;
+
+	min-width: 90px;
+	height: 31px;
+	background: linear-gradient(180deg, #5689CC 0%, #3465A4 100%);
+	border: 1px solid #486B99;
+	box-sizing: border-box;
+	border-radius: 5px;
+
+	/* Text */
+
+	font-style: normal;
+	font-weight: normal;
+	font-size: 14px;
+	line-height: 14px;
+	/* identical to box height */
+	text-align: center;
+
+	color: #FFFFFF;
+
+	text-shadow: 0px 1px 1px rgba(0, 0, 0, 0.25);
+}
+
+#overlay {
+	position: fixed;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	background-color: black;
+	opacity: 0.25;
+	display: none;
+}
+.popup {
+	box-shadow: 3px 4px 4px rgba(0, 0, 0, 0.25);
+	position: absolute;
+	top: 158px;
+	left: 50%;
+	transform: translateX(-50%);
+
+	max-width: 400px;
+	padding: 22px;
+
+	background: #FFFFFF;
+	border: 1px solid #000000;
+	box-sizing: border-box;
+	border-radius: 5px;
+
+	display: none;
+}
+.popup .close {
+	cursor: pointer;
+	position: absolute;
+	top: -22px;
+	right: -22px;
+	width: 44px;
+	height: 44px;
+	border-radius: 900px;
+	/* Ellipse */
+	background: linear-gradient(180deg, #5689CC 0%, #3465A4 100%);
+	border: 1px solid #000000;
+	box-sizing: border-box;
+	padding: 13px;
+}
+.popup button {
+	float: right;
+	margin-top: 20px;
+}
+.popup h1 {
+	font-size: 20px;
+	font-weight: normal;
+	margin: 0;
+}
+
+main {
+	width: 950px;
+	margin: 0 auto;
+	height: 100%;
+	position: relative;
+}
+a {
+	text-decoration: underline;
+	cursor: pointer;
+	color: #5689CC;
+}
+main > header {
+	position: absolute;
+	right: 0;
+	top: 59px;
+	color: white;
+	text-align: right;
+}
+
+#logged-in a { color: white }
+#logged-in { display: none }
+#logged-in-menu { cursor: pointer }
+#selected-count {
+	display: inline-block;
+	margin-right: 40px;
+}
+
+#logout {
+	display: none;
+	cursor: pointer;
+	color: black;
+	position: absolute;
+	right: 0;
+	top: 20px;
+	text-align: center;
+	font-size: 16px;
+	background: #FFFFFF;
+	border: 1px solid #000000;
+	box-sizing: border-box;
+	border-radius: 5px;
+	width: 83px;
+	height: 24px;
+	padding: 4px;
+}
+
+#request-item {
+	position: absolute;
+	left: 495px;
+	top: 159px;
+}
+
+#req-popup {
+	width: 338px;
+}
+#req-popup .timepicker .x {
+	display: none;
+}
+
+#selected-popup, #selected-none-popup {
+	width: 392px;
+}
+#too-many-popup {
+}
+
+.timepicker {
+	margin-top: 20px;
+	font-size: 20px;
+}
+.timepicker > span {
+	display: inline-block;
+	margin: 0 0.5em;
+}
+.timepicker select {
+	font-size: 20px;
+	height: 40px;
+	border: 1px solid black;
+	background-color: white;
+}
+.timepicker select.time {
+	text-transform: uppercase;
+	width: 95px;
+}
+
+.requested {
+	margin-top: 20px;
+}
+.requested h2 {
+	font-size: 20px;
+	font-weight: normal;
+	margin: 0;
+}
+.requested .timepicker {
+	margin-top: 10px;
+}
+.requested .timepicker .x {
+	display: inline-block;
+	margin-left: 0.5em;
+	cursor: pointer;
+}
+</style>
+	</head>
+	<body>
+		<main>
+			<header>
+				<a id="login">Login</a>
+				<div id="logged-in">
+					<a id="selected-count"><span id="count">0</span> items scheduled</a>
+					<svg id="logged-in-menu" width="35" height="15" viewBox="0 0 35 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<path d="M28 13L34.0622 4.75H21.9378L28 13Z" fill="white"/>
+						<path d="M8.5 8C3.80558 8 0 11.134 0 15H17C17 11.134 13.1944 8 8.5 8Z" fill="white"/>
+						<circle cx="8.5" cy="4.5" r="4.5" fill="white"/>
+					</svg>
+					<div id="logout">Logout</div>
+				</div>
+			</header>
+			<button id="request-item">Request Item</button>
+
+			<div id="overlay"></div>
+
+			<div id="selected-none-popup" class="popup">
+				<h1>You have no requested items.</h1>
+				<p>
+					You may schedule items within the next week, or for
+					immediate use &mdash; simply click "Request Item"
+				</p>
+			</div>
+
+			<div id="selected-popup" class="popup">
+				<h1>You have requested</h1>
+				<div class="req-list"></div>
+			</div>
+
+			<div id="req-popup" class="popup">
+				<h1>Please be ready by</h1>
+				<div class="timepicker"></div>
+				<p>
+					By clicking Request I acknowledge I have read, understood,
+					and accepted the stipulations in the <a class='permissions'>L. Tom Perry
+					Special Collections Permissions for Use Form</a>.
+				</p>
+			</div>
+
+			<div id="too-many-popup" class="popup">
+				<h1>
+					You may only request 3 items for the same time. You may
+					remove or reschedule conflicting items, or cancel.
+				</h1>
+				<div class="req-list"></div>
+			</div>
+
+			<svg id="flash" width="300" height="300" viewBox="0 0 300 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+				<g opacity="0.1">
+				<g filter="url(#filter0_b)">
+				<path d="M300 150C300 232.843 232.843 300 150 300C67.1573 300 0 232.843 0 150C0 67.1573 67.1573 0 150 0C232.843 0 300 67.1573 300 150ZM139.869 150C139.869 155.595 144.405 160.131 150 160.131C155.595 160.131 160.131 155.595 160.131 150C160.131 144.405 155.595 139.869 150 139.869C144.405 139.869 139.869 144.405 139.869 150Z" fill="#FBFF24"/>
+				</g>
+				</g>
+				<defs>
+				<filter id="filter0_b" x="-4" y="-4" width="308" height="308" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+				<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+				<feGaussianBlur in="BackgroundImage" stdDeviation="2"/>
+				<feComposite in2="SourceAlpha" operator="in" result="effect1_backgroundBlur"/>
+				<feBlend mode="normal" in="SourceGraphic" in2="effect1_backgroundBlur" result="shape"/>
+				</filter>
+				</defs>
+			</svg>
+		</main>
+
+		<div id="components" style="display: none">
+			<div class="popup">
+				<div class="close">
+					<svg class="x" width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<path d="M8.75 8L16.5 1L1 15L8.75 8ZM8.75 8L1 1M8.75 8L16.5 15" stroke="white"/>
+					</svg>
+				</div>
+				<button>Done</button>
+			</div>
+
+			<div class="requested">
+				<h2>name</h2>
+				<div class="timepicker">
+					<select class="day"></select>
+					<span> at </span>
+					<select class="time"> </select>
+					<svg class="x" width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<path d="M8.75 8L16.5 1L1 15L8.75 8ZM8.75 8L1 1M8.75 8L16.5 15" stroke="black"/>
+					</svg>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script>
+		(function() {
+			const qs = document.querySelector.bind(document);
+			const qsa = document.querySelectorAll.bind(document);
+
+			const count = qs('#count');
+			const overlay = qs('#overlay');
+			const flash = qs('#flash');
+
+			const now = new Date();
+			const times = [
+				['m t w h f', '8:00 am', 8],
+				['m t w h f', '8:30 am', 8.5],
+				['m t w h f', '9:00 am', 9],
+				['m t w h f', '9:30 am', 9.5],
+				['m t w h f s', '10:00 am', 10],
+				['m w h f s', '10:30 am', 10.5],
+				['m w h f s', '11:00 am', 11],
+				['m w h f s', '11:30 am', 11.5],
+				['m w h f s', '12:00 pm', 12],
+				['m t w h f s', '12:30 pm', 12.5],
+				['m t w h f s', '1:00 pm', 13],
+				['m t w h f s', '1:30 pm', 13.5],
+				['m t w h f s', '2:00 pm', 14],
+				['m t w h f s', '2:30 pm', 14.5],
+				['m t w h f s', '3:00 pm', 15],
+				['m t w h f s', '3:30 pm', 15.5],
+				['m t w h f s', '4:00 pm', 16],
+				['m t w h f s', '4:30 pm', 16.5],
+				['m t w h f s', '5:00 pm', 17],
+				['m t w h f s', '5:30 pm', 17.5],
+				['m t w h', '6:00 pm', 18],
+				['m t w h', '6:30 pm', 18.5],
+				['m t w h', '7:00 pm', 19],
+				['m t w h', '7:30 pm', 19.5],
+				['m t w h', '8:00 pm', 20],
+				['m t w h', '8:30 pm', 20.5],
+			];
+			let days = [
+				null,
+				['m', 'Monday'],
+				['t', 'Tuesday'],
+				['w', 'Wednesday'],
+				['h', 'Thursday'],
+				['f', 'Friday'],
+				['s', 'Saturday'],
+			];
+			for (let i = now.getDay(); i > 0; i--)
+				days.push(days.shift());
+			if (now.getDay() == 0) // allow Today on Sunday only; no times
+				days[0] = ['u', ''];
+			days = days.filter(a => a);
+			days[0][1] = 'Today';
+			if (now.getDay() != 6) // Monday isn't tomorrow on Saturday
+				days[1][1] = 'Tomorrow';
+
+			function wipeNode(node) {
+				while (node.firstChild)
+					node.removeChild(node.firstChild);
+			}
+
+			const daylist = qs('#components .day');
+			wipeNode(daylist);
+			daylist.append(...days.map(([code, name], i) => {
+				const opt = document.createElement('option');
+				opt.value = code;
+				opt.innerHTML = name;
+				if (i == 0)
+					opt.selected = true;
+				return opt;
+			}));
+
+			function makeTimelist(dayCode, asap, selected) {
+				const now = new Date();
+				const hours = now.getHours();
+				const minutes = now.getMinutes();
+
+				let list = times.filter(t => t[0].match(dayCode));
+				if (dayCode === days[0][0]) {
+					const beat = hours + (Math.floor(minutes / 30) / 2);
+					list = times.filter(t => t[2] > beat);
+				}
+				list = list.map(data => {
+					const opt = document.createElement('option');
+					opt.value = data[1];
+					opt.innerHTML = data[1];
+					if (selected === data[1])
+						opt.selected = true;
+					return opt;
+				});
+
+				// if today, add ASAP for the current floored time
+				if (dayCode === days[0][0]) {
+					const opt = document.createElement('option');
+
+					opt.value = `${hours % 12 || 12}:${Math.floor(minutes / 30) ? '30' : '00'} ${Math.floor(hours / 12) >= 1 ? 'p' : 'a'}m`;
+
+					if (asap)
+						opt.innerHTML = 'ASAP';
+					else
+						opt.innerHTML = opt.value;
+
+					list.unshift(opt);
+				}
+
+				// make sure something always selected
+				if (!list.filter(o => o.selected).length)
+					list[0].selected = true;
+
+				return list;
+			}
+
+			const timelist = qs('#components .time');
+			wipeNode(timelist);
+			timelist.append(...makeTimelist(days[0][0], true));
+
+			let popups = 0;
+			let basket = [];
+			const state = {
+				set overlay(val) {
+					if (val) {
+						if (popups == 0)
+							overlay.style.display = 'initial';
+						popups++;
+					} else {
+						if (popups == 1)
+							overlay.style.display = 'none';
+						else if (popups <= 0)
+							return;
+						popups--;
+					}
+				},
+			};
+
+			let loggedin = false;
+			const logged_in = qs('#logged-in');
+			const logged_out = qs('#login');
+			function login() {
+				loggedIn = true;
+				logged_in.style.display = 'initial';
+				logged_out.style.display = 'none';
+			}
+			function logout() {
+				loggedIn = false;
+				logged_in.style.display = 'none';
+				logged_out.style.display = 'initial';
+			}
+
+			function triggerFlash() {
+				count.innerText = basket.length;
+				flash.style.display = 'initial';
+				setTimeout(() => flash.style.display = 'none', 800);
+			}
+
+			const cancel = e => {
+				let target = e.target.parentNode;
+				while (target && !target.classList.contains('popup'))
+					target = target.parentNode;
+				if (!target) alert('Missing target');
+				target.style.display = 'none';
+				state.overlay = false;
+			};
+
+			// This one gets duped into a list to replace.
+			const requested = qs('#components .requested');
+			function rebuildRequested(node, filter) {
+				const list = basket.map((entry, i) => {
+					if (filter && !filter(entry)) return null;
+
+					const instance = requested.cloneNode(true);
+					instance.querySelector('h2').innerText = entry[0];
+
+					const day = instance.querySelector('.day');
+					day.value = entry[1];
+					day.addEventListener('change', e => {
+						basket[i][1] = e.target.value;
+						if (!filter)
+							rebuildRequested(node, filter);
+					});
+
+					const time = instance.querySelector('.time');
+					wipeNode(time);
+					time.append(...makeTimelist(entry[1], true, entry[2]));
+					time.addEventListener('change', e => {
+						basket[i][2] = e.target.value;
+						if (!filter)
+							rebuildRequested(node, filter);
+					});
+
+					instance.querySelector('.x').addEventListener('click', () => {
+						basket.splice(i, 1);
+						triggerFlash();
+						rebuildRequested(node, filter);
+						if (!filter && !basket.length) {
+							qs('#selected-popup').style.display = 'none';
+							qs('#selected-none-popup').style.display = 'initial';
+						}
+					});
+
+					return instance;
+				}).filter(a => a);
+
+				wipeNode(node);
+				node.append(...list);
+			}
+
+			const requestItem = e => {
+				let target = e.target.parentNode;
+				while (target && !target.classList.contains('popup'))
+					target = target.parentNode;
+				if (!target) alert('Missing target');
+
+				const day = target.querySelector('.day').value;
+				const time = target.querySelector('.time').value;
+
+				const atsametime = basket.filter(b => b[1] === day && b[2] === time);
+				if (atsametime.length >= 3) {
+					const toomany = qs('#too-many-popup');
+					const toomanyList = toomany.querySelector('.req-list');
+					toomany.style.display = 'initial';
+					rebuildRequested(toomanyList, b => b[1] === day && b[2] === time);
+					return;
+				}
+
+				basket.push([ 'Maurine Whipple Papers', day, time ]);
+				triggerFlash();
+				cancel(e);
+			};
+
+			// startup - replace elements w/components
+
+			const popup = qs('#components .popup');
+			['req', 'selected', 'selected-none', 'too-many'].forEach(name => {
+				const node = qs(`#${name}-popup`);
+				const instance = popup.cloneNode(true);
+				node.parentNode.replaceChild(instance, node);
+
+				instance.prepend(...node.children);
+				instance.id = node.id;
+				instance.querySelector('.close').addEventListener('click', cancel);
+
+				if (name === 'req') {
+					instance.querySelector('button').innerText = 'Request';
+					instance.querySelector('button').addEventListener('click', requestItem);
+					instance.querySelector('a.permissions').addEventListener('click', () => {
+						alert('Out of scope, and so far only one user has clicked on it anyway');
+					});
+				} else {
+					instance.querySelector('button').addEventListener('click', cancel);
+				}
+			});
+
+			const timepicker = qs('#components .timepicker');
+			const changeTimes = e => {
+				const time = e.target.parentNode.querySelector('.time');
+				const val = time.value;
+				wipeNode(time);
+				time.append(...makeTimelist(e.target.value, true, val));
+			};
+			qsa('main .timepicker').forEach(node => {
+				const instance = timepicker.cloneNode(true);
+				node.parentNode.replaceChild(instance, node);
+				instance.querySelector('select.day').addEventListener('change', changeTimes);
+			});
+
+			// startup - bind clicks
+
+			qs('#request-item').addEventListener('click', () => {
+				if (!loggedin)
+					login();
+				state.overlay = true;
+				qs('#req-popup').style.display = 'block';
+			});
+
+			qs('#selected-count').addEventListener('click', () => {
+				state.overlay = true;
+				if (basket.length) {
+					const selected = qs('#selected-popup');
+					rebuildRequested(selected.querySelector('.req-list'));
+					selected.style.display = 'block';
+				} else {
+					qs('#selected-none-popup').style.display = 'block';
+				}
+			});
+
+			logged_out.addEventListener('click', login);
+
+			const logout_opt = qs('#logout');
+			qs('#logged-in-menu').addEventListener('click', () => {
+				logout_opt.style.display = 'initial';
+			});
+			logout_opt.addEventListener('click', () => {
+				logout_opt.style.display = 'none';
+				logout();
+			});
+
+
+			// TODO: don't allow changing to a time w/three things already there - disable the option or something
+		})();
+	</script>
+</html>
