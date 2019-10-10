@@ -504,6 +504,7 @@ main > header {
 				if (atsametime.length >= 3) {
 					const toomany = qs('#too-many-popup');
 					const toomanyList = toomany.querySelector('.req-list');
+					state.overlay = true;
 					toomany.style.display = 'initial';
 					rebuildRequested(toomanyList, b => b[1] === day && b[2] === time);
 					return;
