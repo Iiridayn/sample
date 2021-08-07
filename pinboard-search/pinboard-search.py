@@ -50,13 +50,29 @@ class Server(BaseHTTPRequestHandler):
         toread = ''
         url = ''
         search = ''
+        and_query = []
+        or_groups = []
+        or_open = False
         for q in query:
+            # TODO: support special operators except l for or groups?
+            # At least return an error if used, ideally
+            if q[0:1] == '~':
+                if not or_open:
+                    or_groups.append([])
+                    or_open = True
+                or_groups[-1].append(q[1:])
+                continue
+            elif or_open:
+                or_open = False
+
             if q[0:2] == 'l:':
                 limit = max(int(q[2:]), 0)
+
             elif q[0:2] == 'u:':
                 url = q[2:].lower()
             elif q[0:2] == 's:':
                 search = q[2:].lower()
+
             elif q == 'p':
                 shared = "no"
             elif q == '-p':
@@ -65,7 +81,9 @@ class Server(BaseHTTPRequestHandler):
                 toread = "yes"
             elif q == '-t':
                 toread = "no"
-        tag_query = [q for q in query if q not in ['p', '-p', 't', '-t'] and q[0:2] not in ['l:', 's:', 'u:']]
+
+            else:
+                and_query.append(q)
 
         def match(i):
             tags = i["tags"].split(' ')
@@ -74,11 +92,24 @@ class Server(BaseHTTPRequestHandler):
             if shared and i["shared"] != shared:
                 return False
 
-            for t in tag_query:
+            for t in and_query:
                 if t[0] == '-':
                     if t[1:] in tags:
                         return False
                 elif t not in tags:
+                    return False
+
+            for or_group in or_groups:
+                found = False
+                for t in or_group:
+                    if t[0] == '-':
+                        if t[1:] not in tags:
+                            found = True
+                            break
+                    elif t in tags:
+                        found = True
+                        break
+                if not found:
                     return False
 
             if url and -1 == i['href'].find(url):
