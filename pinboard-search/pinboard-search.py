@@ -130,6 +130,7 @@ class Server(BaseHTTPRequestHandler):
 
         results = [i for i in data if match(i)]
 
+        total = len(results)
         # Random sort if limited; default to first 20
         if limit:
             shuffle(results)
@@ -143,7 +144,9 @@ class Server(BaseHTTPRequestHandler):
             tagblock = f"<p class=\"tags\">{item['tags']}</p>"
             self.wfile.write(f"<li>{link}{desc}{tagblock}</li>".encode())
 
-        self.wfile.write(b"</ul></body></html>")
+        self.wfile.write(b"</ul>")
+        self.wfile.write(f"<p>Mached: {total}</p>".encode())
+        self.wfile.write(b"</body></html>")
 
 httpd = HTTPServer(('', 8001), Server)
 
