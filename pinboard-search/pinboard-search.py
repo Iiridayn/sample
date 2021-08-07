@@ -85,6 +85,19 @@ class Server(BaseHTTPRequestHandler):
             else:
                 and_query.append(q)
 
+        def in_tags(t, tags):
+            if (t[0] == '+'):
+                for tag in tags:
+                    if tag[:len(t)] == t:
+                        return True
+            return t in tags
+
+        def check_tags(t, tags):
+            if t[0] == '-':
+                return not in_tags(t[1:], tags)
+            else:
+                return in_tags(t, tags)
+
         def match(i):
             tags = i["tags"].split(' ')
             if toread and i["toread"] != toread:
@@ -93,20 +106,13 @@ class Server(BaseHTTPRequestHandler):
                 return False
 
             for t in and_query:
-                if t[0] == '-':
-                    if t[1:] in tags:
-                        return False
-                elif t not in tags:
+                if not check_tags(t, tags):
                     return False
 
             for or_group in or_groups:
                 found = False
                 for t in or_group:
-                    if t[0] == '-':
-                        if t[1:] not in tags:
-                            found = True
-                            break
-                    elif t in tags:
+                    if check_tags(t, tags):
                         found = True
                         break
                 if not found:
