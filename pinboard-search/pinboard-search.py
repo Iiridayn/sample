@@ -92,6 +92,11 @@ class Server(BaseHTTPRequestHandler):
         and_query = []
         or_groups = []
         or_open = False
+        # TODO: Full logical search syntax? ~~, ~+, ~~~, etc
+        # Can do a full union by not requring + on first term
+        # ~foo ~+bar ~+baz ~quux ~+zot = (foo bar baz) | (quux zot)
+        # Nesting: ~foo ~~bar ~~baz ~quux zot = ((foo (bar | baz)) | quux) zot
+        # Error if ~~ not proceeded by ~; many nested or collapse w/o and
         for q in query:
             if q[0:2] == 'l:':
                 limit = max(int(q[2:]), 0)
