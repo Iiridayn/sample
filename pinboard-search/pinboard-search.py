@@ -26,6 +26,49 @@ def sighup(num, frame):
 
 signal.signal(signal.SIGHUP, sighup);
 
+def check(q, i, tags):
+    if q[0] == '-': # simple recurse to negate
+        if q[1] == '-': # prevent recursion DoS; can't use --* meaninfully anyway
+            return False
+        return not check(q[1:], i, tags)
+
+    if q[0] == '+': # match >= count of +
+        for tag in tags:
+            if tag[:len(q)] == q:
+                return True
+    elif q == 'p':
+        return i["shared"] == "no"
+    elif q == 't':
+        return i["toread"] == "yes"
+    elif q[0:2] == 'u:':
+        url = q[2:].lower()
+        return -1 != i['href'].find(url)
+    elif q[0:2] == 's:':
+        search = q[2:].lower()
+        return -1 != i['href'].lower().find(search) \
+            or -1 != i['description'].lower().find(search) \
+            or -1 != i['extended'].lower().find(search)
+
+    return q in tags
+
+def matches(i, and_query, or_groups):
+    tags = i["tags"].split(' ')
+
+    for q in and_query:
+        if not check(q, i, tags):
+            return False
+
+    for or_group in or_groups:
+        found = False
+        for q in or_group:
+            if check(q, i, tags):
+                found = True
+                break
+        if not found:
+            return False
+
+    return True
+
 class Server(BaseHTTPRequestHandler):
     def do_GET(self):
         self.send_response_only(200)
@@ -46,17 +89,16 @@ class Server(BaseHTTPRequestHandler):
         self.wfile.write(b"</h1><ul>")
 
         limit = 20
-        shared = ''
-        toread = ''
-        url = ''
-        search = ''
         and_query = []
         or_groups = []
         or_open = False
         for q in query:
-            # TODO: support special operators except l for or groups?
-            # At least return an error if used, ideally
-            if q[0:1] == '~':
+            if q[0:2] == 'l:':
+                limit = max(int(q[2:]), 0)
+                continue
+
+            # Odd behavior if ~l:x; treated as regular tag
+            if q[0] == '~':
                 if not or_open:
                     or_groups.append([])
                     or_open = True
@@ -65,70 +107,9 @@ class Server(BaseHTTPRequestHandler):
             elif or_open:
                 or_open = False
 
-            if q[0:2] == 'l:':
-                limit = max(int(q[2:]), 0)
+            and_query.append(q)
 
-            elif q[0:2] == 'u:':
-                url = q[2:].lower()
-            elif q[0:2] == 's:':
-                search = q[2:].lower()
-
-            elif q == 'p':
-                shared = "no"
-            elif q == '-p':
-                shared = "yes"
-            elif q == 't':
-                toread = "yes"
-            elif q == '-t':
-                toread = "no"
-
-            else:
-                and_query.append(q)
-
-        def in_tags(t, tags):
-            if (t[0] == '+'):
-                for tag in tags:
-                    if tag[:len(t)] == t:
-                        return True
-            return t in tags
-
-        def check_tags(t, tags):
-            if t[0] == '-':
-                return not in_tags(t[1:], tags)
-            else:
-                return in_tags(t, tags)
-
-        def match(i):
-            tags = i["tags"].split(' ')
-            if toread and i["toread"] != toread:
-                return False
-            if shared and i["shared"] != shared:
-                return False
-
-            for t in and_query:
-                if not check_tags(t, tags):
-                    return False
-
-            for or_group in or_groups:
-                found = False
-                for t in or_group:
-                    if check_tags(t, tags):
-                        found = True
-                        break
-                if not found:
-                    return False
-
-            if url and -1 == i['href'].find(url):
-                return False
-
-            if search:
-                return -1 != i['href'].lower().find(search) \
-                    or -1 != i['description'].lower().find(search) \
-                    or -1 != i['extended'].lower().find(search)
-
-            return True
-
-        results = [i for i in data if match(i)]
+        results = [i for i in data if matches(i, and_query, or_groups)]
 
         total = len(results)
         # Random sort if limited; default to first 20
