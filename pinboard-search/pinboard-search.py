@@ -1,4 +1,5 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
+from urllib.parse import unquote
 import json
 import os
 from os.path import expanduser
@@ -75,7 +76,7 @@ class Server(BaseHTTPRequestHandler):
         self.send_header("Content-type", "text/html; charset=utf-8")
         self.end_headers()
 
-        query = self.path.rstrip('/').split('/')[1:]
+        query = unquote(self.path).rstrip('/').split('/')[1:]
         qs = ' '.join(query)
 
         self.wfile.write(b"<!doctype html>\n<html><head><link rel='icon' href='data:,'><title>")
