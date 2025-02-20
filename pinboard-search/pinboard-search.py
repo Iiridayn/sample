@@ -12,7 +12,7 @@ if len(argv) < 2:
     print(f"USAGE: {argv[0]} <file>")
     exit(1)
 
-pidfile = os.environ.get('XDG_RUNTIME_DIR') + '/pinboard-search.pid'
+#pidfile = os.environ.get('XDG_RUNTIME_DIR') + '/pinboard-search.pid'
 data = []
 datafile = argv[1]
 
@@ -29,7 +29,7 @@ signal.signal(signal.SIGHUP, sighup);
 
 def check(q, i, tags):
     if q[0] == '-': # simple recurse to negate
-        if q[1] == '-': # prevent recursion DoS; can't use --* meaninfully anyway
+        if q[1] == '-': # prevent recursion DoS; can't use --* meaningfully anyway
             return False
         return not check(q[1:], i, tags)
 
@@ -94,7 +94,7 @@ class Server(BaseHTTPRequestHandler):
         or_groups = []
         or_open = False
         # TODO: Full logical search syntax? ~~, ~+, ~~~, etc
-        # Can do a full union by not requring + on first term
+        # Can do a full union by not requiring + on first term
         # ~foo ~+bar ~+baz ~quux ~+zot = (foo bar baz) | (quux zot)
         # Nesting: ~foo ~~bar ~~baz ~quux zot = ((foo (bar | baz)) | quux) zot
         # Error if ~~ not proceeded by ~; many nested or collapse w/o and
@@ -137,21 +137,21 @@ class Server(BaseHTTPRequestHandler):
 
 httpd = HTTPServer(('', 8001), Server)
 
-pidfd = open(pidfile, 'x')
-pidfd.write(str(os.getpid()))
-pidfd.close()
+#pidfd = open(pidfile, 'x')
+#pidfd.write(str(os.getpid()))
+#pidfd.close()
 
-def sigterm(num, frame):
-    print("Graceful shutdown")
-    os.remove(pidfile)
-    #httpd.server_close()
-    #httpd.shutdown()
-    exit(0)
+#def sigterm(num, frame):
+#    print("Graceful shutdown")
+#    os.remove(pidfile)
+#    #httpd.server_close()
+#    #httpd.shutdown()
+#    exit(0)
 
-signal.signal(signal.SIGTERM, sigterm);
-signal.signal(signal.SIGINT, sigterm);
+#signal.signal(signal.SIGTERM, sigterm);
+#signal.signal(signal.SIGINT, sigterm);
 
-print("PID:", os.getpid())
+#print("PID:", os.getpid())
 
 reload()
 httpd.serve_forever()

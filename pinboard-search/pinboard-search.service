@@ -1,0 +1,11 @@
+[Unit]
+Description=Pinboard Bookmark Search Service
+
+[Service]
+ExecStart=python /home/<user>/<path-to>/pinboard-search.py /home/<user>/<path to>/pinboard.json
+WorkingDirectory=/home/<user>
+User=<user>
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
