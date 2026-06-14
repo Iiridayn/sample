@@ -1,0 +1,104 @@
+#!/usr/bin/env python3
+"""
+Claude Code plan usage for i3blocks.
+Endpoint: GET https://api.anthropic.com/api/oauth/usage (undocumented)
+Credentials: ~/.config/claude/.credentials.json
+
+i3blocks:  label=Claude  command=~/.config/i3blocks/claude-usage  interval=600
+"""
+import os, datetime, json, sys, time, urllib.error, urllib.request
+from pathlib import Path
+
+CREDS = Path.home() / ".config/claude/.credentials.json"
+CACHE = Path(os.environ.get("XDG_RUNTIME_DIR", f"/run/user/{os.getuid()}")) / "claude_usage.json"
+TTL   = 600
+
+
+def dbg(msg):
+    print(f"[claude-usage] {msg}", file=sys.stderr)
+
+def delta(iso):
+    """Time remaining until ISO 8601 timestamp."""
+    try:
+        td = (datetime.datetime.fromisoformat(iso).astimezone(datetime.timezone.utc)
+              - datetime.datetime.now(datetime.timezone.utc))
+        if td.total_seconds() <= 0:
+            return "now"
+        h, m = divmod(td.seconds // 60, 60)
+        if td.days:
+            return f"{td.days}d{h}h"
+        if h:
+            return f"{h}h{m:02d}m"
+        return f"{m}m"
+    except Exception:
+        return "?"
+
+def show(data, state=''):
+    fh     = data.get("five_hour") or {}
+    sd     = data.get("seven_day") or {}
+    fh_pct = fh.get("utilization", 0)
+    sd_pct = sd.get("utilization", 0)
+    state  = f"{state} " if state else ""
+    worst  = max(fh_pct, sd_pct)
+    color  = "#ff4444" if worst >= 85 else "#ffaa00" if worst >= 65 else ""
+    print(f"{state}{fh_pct:.0f}%[{delta(fh.get('resets_at'))}] {sd_pct:.0f}%[{delta(sd.get('resets_at'))}]")
+    print(f"{state}{fh_pct:.0f}/{sd_pct:.0f}")
+    if color:
+        print(color)
+
+# --- cache ---
+cached = None
+try:
+    raw    = json.loads(CACHE.read_text())
+    age    = time.time() - raw.pop("_t")
+    cached = raw
+    dbg(f"cache age {age:.0f}s")
+    if age < TTL:
+        show(cached)
+        sys.exit(0)
+    dbg("stale, refreshing")
+except Exception as e:
+    dbg(f"no cache: {e}")
+
+# --- token ---
+try:
+    oauth  = json.loads(CREDS.read_text())["claudeAiOauth"]
+    token  = oauth["accessToken"]
+    exp_ms = oauth.get("expiresAt", 0)
+except Exception as e:
+    dbg(f"credentials: {e}")
+    show(cached, state='?') if cached else print("no token\n?")
+    sys.exit(0)
+
+if (exp_ms - 90_000) < time.time() * 1000:
+    dbg("token expired; open Claude Code to refresh")
+    show(cached, state='exp') if cached else print("expired\nexp")
+    sys.exit(0)
+
+# --- fetch ---
+req = urllib.request.Request(
+    "https://api.anthropic.com/api/oauth/usage",
+    headers={
+        "Authorization":  f"Bearer {token}",
+        "anthropic-beta": "oauth-2025-04-20",  # required routing header for OAuth usage schema
+        "User-Agent":     "claude-usage-widget/1.0",
+    },
+)
+try:
+    with urllib.request.urlopen(req, timeout=8) as resp:
+        data = json.loads(resp.read())
+except urllib.error.HTTPError as e:
+    dbg(f"HTTP {e.code}")
+    show(cached, state='!') if cached else print(f"http{e.code}\n!")
+    sys.exit(0)
+except Exception as e:
+    dbg(f"fetch failed: {e}")
+    show(cached, state='!') if cached else print("net_err\n!")
+    sys.exit(0)
+
+dbg(f"ok: 5h={((data.get('five_hour') or {}).get('utilization', 0)):.0f}% "
+    f"7d={((data.get('seven_day') or {}).get('utilization', 0)):.0f}%")
+data["_t"] = time.time()
+CACHE.write_text(json.dumps(data))
+data.pop("_t")
+show(data)
