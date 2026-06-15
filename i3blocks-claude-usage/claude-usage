@@ -72,7 +72,7 @@ except Exception as e:
 
 if (exp_ms - 90_000) < time.time() * 1000:
     dbg("token expired; open Claude Code to refresh")
-    show(cached, state='exp') if cached else print("expired\nexp")
+    show(cached, state='*') if cached else print("expired\nexp")
     sys.exit(0)
 
 # --- fetch ---
